@@ -1,0 +1,207 @@
+/* Reset default margin and padding */
+body,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff;
+}
+
+/* Targeting specific to index.html */
+.center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ensure full viewport height */
+  font-family: "Inter", sans-serif;
+  text-align: center; /* Center text within .center */
+}
+
+.center h1 {
+  color: #333; /* Adjust color as needed */
+  margin-bottom: 10px; /* Optional: Add margin to separate from h2 */
+  font-weight: bolder;
+}
+
+.center h2 {
+  color: #666; /* Adjust color as needed */
+  margin-bottom: 20px; /* Optional: Add more space below h2 */
+  font-weight: bold;
+}
+
+.center .button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: green;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 20px;
+  font-weight: 700;
+}
+
+/* Additional styles to center content horizontally */
+.center h1,
+.center h2,
+.center .button {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.spotifyButton {
+  margin: 2vh auto;
+  text-align: center;
+  text-decoration: none;
+  padding: 2vh 5vh;
+  background-color: #1db954;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  color: white;
+}
+
+/* Flexbox container */
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box; /* Ensure padding is included in the total width */
+}
+
+.left-box {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end; /* Right align content */
+  margin-right: 20px; /* Half of the gap between the boxes */
+}
+
+.right-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Left align content */
+  margin-left: 20px; /* Half of the gap between the boxes */
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: green;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+/* Styles for the receipt container */
+.receiptContainer {
+  background-image: url(wrinkled-paper.jpg);
+  background-repeat: repeat;
+  background-size: cover;
+  font-weight: 700;
+  width: 300px;
+  filter: brightness(104%);
+  padding: 20px;
+  text-transform: uppercase;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  max-height: fit-content; /* Set max height to ensure it doesn't reach the bottom */
+  color: black; /* Set text color to black */
+}
+
+.logo {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-weight: 1000; /* Increase font thickness */
+  font-size: 2.3rem;
+  text-align: center;
+  color: black;
+  margin-bottom: 15px; /* Reduce space below logo */
+}
+
+p,
+table,
+.date {
+  font-family: "receipt", "Courier New", Courier, monospace;
+  color: black; /* Set text color to black */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+td {
+  color: black; /* Set text color to black */
+}
+
+.tracks {
+  margin: 5px 0;
+}
+
+table {
+  max-width: 100%;
+  background-color: transparent;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+td.name {
+  width: 700px; /* Adjust this value to increase the width of the song name column */
+  padding-left: 1.2rem;
+}
+
+.name a {
+  text-decoration: none; /* Remove underline */
+  color: inherit; /* Inherit text color from parent */
+}
+
+.space {
+  height: 10rem;
+}
+
+/* Add borders to specific rows */
+.header-row td {
+  border-top: 1px dashed #555; /* Add top dashed border with dark gray color */
+  border-bottom: 1px dashed #555; /* Add bottom dashed border with dark gray color */
+}
+
+.total-counts td {
+  border-top: 1px dashed #555;
+  text-align: left;
+}
+
+.total-counts-end td {
+  border-bottom: 1px dashed #555;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 1000;
+}
+
+.songs {
+  text-align: left;
+}
+
+.period,
+.date,
+.order {
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.date {
+  padding-bottom: 5px;
+}
+
+.thanks {
+  text-align: center;
+}

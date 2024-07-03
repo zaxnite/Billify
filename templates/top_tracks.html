@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <title>Top Tracks</title>
+  </head>
+  <body>
+    <div class="flex-container">
+      <div class="left-box">
+        <div class="receipt">
+          {% from 'macros.html' import receiptContainer %} {{
+          receiptContainer(user_name, top_tracks, 'top_tracks', 'Long Term',
+          currentTime, card_number, auth_code, get_spotify_track_link) }}
+        </div>
+      </div>
+      <div class="right-box">
+        <h1>Welcome, {{ user_name }}</h1>
+        <h2>Here's your Trackify Receipt</h2>
+        <button class="button">Action Button</button>
+      </div>
+    </div>
+    <div class="space"></div>
+  </body>
+</html>
