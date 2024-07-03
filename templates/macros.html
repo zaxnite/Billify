@@ -1,0 +1,58 @@
+<!-- macros.html -->
+{% macro receiptContainer(display_name, songs, id, duration, currentTime,
+card_number, auth_code, get_spotify_track_link) -%}
+<div class="receiptContainer" id="{{ id }}">
+  <p class="logo">TRACKIFY</p>
+  <p class="period">{{ duration }}</p>
+  <p class="order">ORDER #0001 FOR {{ display_name }}</p>
+  <p class="date date2">{{ currentTime | strftime('%A, %B %d, %Y') }}</p>
+
+  <table class="tracks">
+    <thead>
+      <tr class="header-row">
+        <td class="begin">QTY</td>
+        <td class="name">ITEM</td>
+        <td class="length">AMT</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for song in songs %}
+      <tr class="songs">
+        <td class="begin">{{ '%02d' | format(loop.index) }}</td>
+        <td class="name">
+          <a
+            href="{{ get_spotify_track_link(song.name, song.artists[0].name) }}"
+            target="_blank"
+          >
+            {{ song.name }} - {{ song.artists[0].name }}
+          </a>
+        </td>
+        <td class="length">{{ song.duration_ms | mmss }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="total-counts">
+        <td class="begin" colspan="2">ITEM COUNT:</td>
+        <td class="length">{{ songs | length }}</td>
+      </tr>
+      <tr class="total-counts-end">
+        <td class="begin" colspan="2">TOTAL:</td>
+        <td class="length">
+          {{ (songs | sum(attribute='duration_ms')) | mmss }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="date">CARD #: {{ card_number }}</p>
+  <p class="date">AUTH CODE: {{ auth_code }}</p>
+  <p class="date">CARDHOLDER: {{ display_name }}</p>
+  <div class="thanks">
+    <p>THANK YOU FOR VISITING!</p>
+    <img
+      style="width: 80%"
+      src="{{ url_for('static', filename='barcode.png') }}"
+    />
+    <p class="website">Trackify.com</p>
+  </div>
+</div>
+{%- endmacro %}

@@ -1,0 +1,3 @@
+CLIENT_ID = "c0a2ace680bb4025a95ee891618578c2"
+CLIENT_SECRET = "96eee01189fc4600aa0989b7297f73da"
+SECRET_KEY = "bfjbsjnjlsaniomelOAH992nsk-kjs"
