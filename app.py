@@ -111,11 +111,11 @@ def redirectPage():
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     session[TOKEN_INFO] = token_info
-    return redirect(url_for('top_tracks'))
+    return redirect(url_for('trackify'))  # Update endpoint name here
 
 
-@app.route('/top_tracks')
-def top_tracks():
+@app.route('/trackify')
+def trackify():  # Change the function name to match the endpoint
     token_info = get_token()
     if not token_info:
         return redirect(url_for('login'))
@@ -133,7 +133,7 @@ def top_tracks():
     random_card_number = generate_random_card_number()
     random_auth_code = generate_random_auth_code()
 
-    return render_template('top_tracks.html', user_name=user_name, top_tracks=top_tracks,
+    return render_template('trackify.html', user_name=user_name, top_tracks=top_tracks,
                            currentTime=current_time, card_number=random_card_number, auth_code=random_auth_code,
                            get_spotify_track_link=get_spotify_track_link)
 

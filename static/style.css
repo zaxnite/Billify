@@ -116,7 +116,7 @@ body {
   text-transform: uppercase;
   border: 1px solid #ccc;
   background-color: #f9f9f9;
-  max-height: fit-content; /* Set max height to ensure it doesn't reach the bottom */
+  max-height: max-content; /* Set max height to ensure it doesn't reach the bottom */
   color: black; /* Set text color to black */
 }
 
@@ -181,8 +181,6 @@ td.name {
 .total-counts-end td {
   border-bottom: 1px dashed #555;
   text-align: left;
-  font-size: 16px;
-  font-weight: 1000;
 }
 
 .songs {
