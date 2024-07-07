@@ -13,9 +13,9 @@
     <div class="flex-container">
       <div class="left-box">
         <div class="receipt">
-          {% from 'macros.html' import receiptContainer %} {% set id =
-          'receipt-container' %} {{ receiptContainer(user_name, top_tracks, id,
-          currentTime, card_number, auth_code, get_spotify_track_link) }}
+          {% from 'macros.html' import receiptContainer %} {{
+          receiptContainer(user_name, top_tracks, id, duration, currentTime,
+          card_number, auth_code, get_spotify_track_link) }}
         </div>
       </div>
       <div class="right-box">
