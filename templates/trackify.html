@@ -7,21 +7,25 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
-    <title>Top Tracks</title>
+    <title>Trackify Receipt</title>
   </head>
   <body>
     <div class="flex-container">
       <div class="left-box">
         <div class="receipt">
-          {% from 'macros.html' import receiptContainer %} {{
-          receiptContainer(user_name, top_tracks, 'top_tracks', 'Long Term',
+          {% from 'macros.html' import receiptContainer %} {% set id =
+          'receipt-container' %} {{ receiptContainer(user_name, top_tracks, id,
           currentTime, card_number, auth_code, get_spotify_track_link) }}
         </div>
       </div>
       <div class="right-box">
         <h1>Welcome, {{ user_name }}</h1>
         <h2>Here's your Trackify Receipt</h2>
-        <button class="button">Action Button</button>
+        <div class="time-button-container">
+          <button class="time-button">Last Month</button>
+          <button class="time-button">Last 6 Months</button>
+          <button class="time-button">Last Year</button>
+        </div>
       </div>
     </div>
     <div class="space"></div>
