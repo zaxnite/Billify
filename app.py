@@ -111,10 +111,15 @@ def redirectPage():
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     session[TOKEN_INFO] = token_info
-    return redirect(url_for('trackify'))  # Update endpoint name here
+    return redirect(url_for('trackify'))
 
 
-@app.route('/trackify')
+def get_duration_from_button():
+    duration = request.form.get('duration', 'medium_term')
+    return duration
+
+
+@app.route('/trackify', methods=['GET', 'POST'])
 def trackify():
     token_info = get_token()
     if not token_info:
@@ -123,10 +128,21 @@ def trackify():
     sp = spotipy.Spotify(auth=token_info['access_token'])
     user_info = sp.current_user()
     user_name = user_info['display_name']
-    duration = "long_term"
+
+    # Get the duration from the form submission
+    duration = get_duration_from_button()
+
+    duration_text_map = {
+        'short_term': 'Last Month',
+        'medium_term': 'Last 6 months',
+        'long_term': 'Last Year'
+    }
+
+    # Default to 'Last Month' if not found
+    duration_text = duration_text_map.get(duration, 'Last Month')
+
     id = "top_tracks"
-    top_tracks_data = sp.current_user_top_tracks(
-        limit=10, time_range=duration)
+    top_tracks_data = sp.current_user_top_tracks(limit=10, time_range=duration)
     top_tracks = top_tracks_data['items']
 
     current_time = datetime.now().strftime('%A, %B %d, %Y')
@@ -135,8 +151,8 @@ def trackify():
     random_auth_code = generate_random_auth_code()
 
     return render_template('trackify.html', user_name=user_name, top_tracks=top_tracks, id=id, duration=duration,
-                           currentTime=current_time, card_number=random_card_number, auth_code=random_auth_code,
-                           get_spotify_track_link=get_spotify_track_link)
+                           duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
+                           auth_code=random_auth_code, get_spotify_track_link=get_spotify_track_link)
 
 
 if __name__ == '__main__':
