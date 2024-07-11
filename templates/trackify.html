@@ -3,48 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <title>Trackify Receipt</title>
   </head>
   <body>
     <div class="flex-container">
       <div class="left-box">
         <div class="receipt">
-          {% from 'macros.html' import receiptContainer %} {{
-          receiptContainer(user_name, top_tracks, id, duration_text,
-          currentTime, card_number, auth_code, get_spotify_track_link) }}
+          {% from 'macros.html' import receiptContainer %}
+          {{ receiptContainer(user_name, top_items, id, duration_text, currentTime, card_number, auth_code, get_spotify_link, metric) }}
         </div>
       </div>
       <div class="right-box">
         <h1>Welcome, {{ user_name }}</h1>
-        <h2>Here's your Trackify Receipt</h2>
+        <h2>Here's your Custom Trackify Receipt</h2>
+        <h3>Metrics</h3>
+        <form id="metricForm" action="/trackify" method="post">
+          <select class="select-dropdown" name="metric" onchange="this.form.submit()">
+            <option value="tracks" {% if metric == 'tracks' %}selected{% endif %}>Top Tracks</option>
+            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Artists</option>
+            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Podcasts</option>
+            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Genres</option>
+            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Stats</option>
+          </select>
+        </form>
+        <h3>Time Period</h3>
         <div class="time-button-container">
           <form id="durationForm" action="/trackify" method="post">
-            <button
-              type="submit"
-              name="duration"
-              value="short_term"
-              class="time-button {% if duration == 'short_term' %}active{% endif %}"
-            >
+            <input type="hidden" name="metric" value="{{ metric }}">
+            <button type="submit" name="duration" value="short_term" class="time-button {% if duration == 'short_term' %}active{% endif %}">
               Last Month
             </button>
-            <button
-              type="submit"
-              name="duration"
-              value="medium_term"
-              class="time-button {% if duration == 'medium_term' %}active{% endif %}"
-            >
+            <button type="submit" name="duration" value="medium_term" class="time-button {% if duration == 'medium_term' %}active{% endif %}">
               Last 6 Months
             </button>
-            <button
-              type="submit"
-              name="duration"
-              value="long_term"
-              class="time-button {% if duration == 'long_term' %}active{% endif %}"
-            >
+            <button type="submit" name="duration" value="long_term" class="time-button {% if duration == 'long_term' %}active{% endif %}">
               Last Year
             </button>
           </form>

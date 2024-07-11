@@ -1,10 +1,10 @@
-from flask import Flask, request, session, url_for, redirect, render_template, jsonify
+from flask import Flask, request, session, url_for, redirect, render_template
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from credentials import CLIENT_ID, CLIENT_SECRET, SECRET_KEY
 import time
 from datetime import datetime
 import random
+from credentials import CLIENT_ID, CLIENT_SECRET, SECRET_KEY
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -90,6 +90,10 @@ def get_spotify_track_link(track_name, artist_name):
     return None
 
 
+def get_spotify_artist_link(artist_id):
+    return f"https://open.spotify.com/artist/{artist_id}"
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -129,8 +133,9 @@ def trackify():
     user_info = sp.current_user()
     user_name = user_info['display_name']
 
-    # Get the duration from the form submission
+    # Get the duration and metric from the form submission
     duration = get_duration_from_button()
+    metric = request.form.get('metric', 'tracks')
 
     duration_text_map = {
         'short_term': 'Last Month',
@@ -138,21 +143,27 @@ def trackify():
         'long_term': 'Last Year'
     }
 
-    # Default to 'Last Month' if not found
     duration_text = duration_text_map.get(duration, 'Last Month')
 
-    id = "top_tracks"
-    top_tracks_data = sp.current_user_top_tracks(limit=10, time_range=duration)
-    top_tracks = top_tracks_data['items']
+    if metric == 'tracks':
+        id = "top_tracks"
+        top_data = sp.current_user_top_tracks(limit=10, time_range=duration)
+        top_items = top_data['items']
+        get_spotify_link = get_spotify_track_link  # Assign the function reference
+    else:
+        id = "top_artists"
+        top_data = sp.current_user_top_artists(limit=10, time_range=duration)
+        top_items = top_data['items']
+        get_spotify_link = get_spotify_artist_link  # Assign the function reference
 
     current_time = datetime.now().strftime('%A, %B %d, %Y')
 
     random_card_number = generate_random_card_number()
     random_auth_code = generate_random_auth_code()
 
-    return render_template('trackify.html', user_name=user_name, top_tracks=top_tracks, id=id, duration=duration,
+    return render_template('trackify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
                            duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
-                           auth_code=random_auth_code, get_spotify_track_link=get_spotify_track_link)
+                           auth_code=random_auth_code, get_spotify_link=get_spotify_link, metric=metric)
 
 
 if __name__ == '__main__':
