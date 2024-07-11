@@ -1,11 +1,10 @@
-<!-- macros.html -->
-{% macro receiptContainer(display_name, songs, id, duration, currentTime,
-card_number, auth_code, get_spotify_track_link) -%}
+{% macro receiptContainer(display_name, items, id, duration, currentTime,
+card_number, auth_code, get_spotify_link, metric) -%}
 <div class="receiptContainer" id="{{ id }}">
   <p class="logo">TRACKIFY</p>
   <p class="period">{{ duration }}</p>
-  <p class="order">ORDER #0001 FOR {{ display_name }}</p>
-  <p class="date date2">{{ currentTime | strftime('%A, %B %d, %Y') }}</p>
+  <p class="order">ORDER #{{ orderNumber }}</p>
+  <p class="date date2">{{ currentTime }}</p>
 
   <table class="tracks">
     <thead>
@@ -15,30 +14,38 @@ card_number, auth_code, get_spotify_track_link) -%}
         <td class="length">AMT</td>
       </tr>
     </thead>
-    <tbody>
-      {% for song in songs %}
+    <tbody id="items-body">
+      {% set total_amt = 0 %} {% for item in items %}
       <tr class="songs">
         <td class="begin">{{ '%02d' | format(loop.index) }}</td>
         <td class="name">
           <a
-            href="{{ get_spotify_track_link(song.name, song.artists[0].name) }}"
+            href="{% if metric == 'tracks' %}
+                  {{ get_spotify_link(item.id, item.artists[0].name) }}
+                {% else %}
+                  {{ get_spotify_link(item.id) }}
+                {% endif %}"
             target="_blank"
           >
-            {{ song.name }} - {{ song.artists[0].name }}
+            {{ item.name }} {% if metric == 'tracks' %} - {{
+            item.artists[0].name }} {% endif %}
           </a>
         </td>
-        <td class="length">{{ song.duration_ms | mmss }}</td>
+        <td class="length amt">
+          {% if metric == 'tracks' %} {{ item.duration_ms | mmss }} {% set
+          total_amt = total_amt + item.duration_ms %} {% else %} {{
+          item.popularity }} {% set total_amt = total_amt + item.popularity %}
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
       <tr class="total-counts">
         <td class="begin" colspan="2">ITEM COUNT:</td>
-        <td class="length">{{ songs | length }}</td>
+        <td class="length">{{ items | length }}</td>
       </tr>
       <tr class="total-counts-end">
         <td class="begin" colspan="2">TOTAL:</td>
-        <td class="length">
-          {{ (songs | sum(attribute='duration_ms')) | mmss }}
-        </td>
+        <td class="length" id="total-amt"></td>
       </tr>
     </tbody>
   </table>
@@ -59,4 +66,64 @@ card_number, auth_code, get_spotify_track_link) -%}
     />
   </div>
 </div>
+
+<script>
+  // Function to format number with leading zeros
+  function formatOrderNumber(num) {
+    let numStr = num.toString();
+    return numStr.padStart(4, "0");
+  }
+
+  // Update page load count and reset on homepage or window close
+  window.addEventListener("beforeunload", function () {
+    // Increment page_load_count in localStorage
+    let pageLoadCount = parseInt(localStorage.getItem("page_load_count")) || 0;
+    localStorage.setItem("page_load_count", pageLoadCount + 1);
+
+    // Reset page_load_count to 0 if leaving the homepage
+    if (window.location.pathname === "/") {
+      // Adjust this condition as per your homepage URL
+      localStorage.setItem("page_load_count", 0);
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get current page load count from localStorage
+    let pageLoadCount = parseInt(localStorage.getItem("page_load_count")) || 0;
+    let orderNumber = formatOrderNumber(pageLoadCount + 1);
+
+    // Display formatted order number
+    document.querySelector(".order").textContent = `ORDER #${orderNumber}`;
+
+    let totalAmt = 0;
+    document.querySelectorAll(".amt").forEach(function (amtElement) {
+      let amtText = amtElement.textContent.trim();
+      let amtValue = 0;
+      if ("{{ metric }}" === "tracks") {
+        let parts = amtText.split(":");
+        if (parts.length === 2) {
+          amtValue = parseInt(parts[0]) * 60 + parseInt(parts[1]);
+        } else if (parts.length === 3) {
+          amtValue =
+            parseInt(parts[0]) * 3600 +
+            parseInt(parts[1]) * 60 +
+            parseInt(parts[2]);
+        }
+      } else {
+        amtValue = parseInt(amtText);
+      }
+      totalAmt += amtValue;
+    });
+
+    if ("{{ metric }}" === "tracks") {
+      let minutes = Math.floor(totalAmt / 60);
+      let seconds = totalAmt % 60;
+      document.getElementById("total-amt").textContent = `${minutes}:${
+        seconds < 10 ? "0" : ""
+      }${seconds}`;
+    } else {
+      document.getElementById("total-amt").textContent = totalAmt;
+    }
+  });
+</script>
 {%- endmacro %}

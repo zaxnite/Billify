@@ -82,6 +82,48 @@ body {
   margin-left: 20px; /* Half of the gap between the boxes */
 }
 
+/* Dropdown Styles */
+.select-container {
+  margin-top: 10px; /* Adjust margin as needed */
+  width: 100%;
+}
+
+.select-dropdown {
+  width: 350px; /* Adjust width as needed */
+  padding: 10px;
+  color: black;
+  border: 2px solid black;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 5px;
+  font-family: "Inter", sans-serif; /* Ensure the font is consistent */
+  font-size: 16px; /* Adjust the font size as needed */
+}
+
+.select-dropdown option {
+  padding: 10px;
+  font-size: 16px;
+  -webkit-appearance: none; /* Remove default styling in WebKit browsers */
+  -moz-appearance: none; /* Remove default styling in Firefox */
+  appearance: none; /* Remove default styling in modern browsers */
+}
+
+.select-dropdown option:hover {
+  background-color: #1ed760; /* Green background on hover */
+  color: white;
+}
+
+.select-dropdown:focus {
+  outline: none;
+  border-color: #1db954; /* Change border color on focus */
+}
+
+.select-dropdown option:checked {
+  background-color: #1db954; /* Green background of selected option */
+  color: white;
+}
+
 /* Button Styles */
 .time-button-container {
   display: flex;
