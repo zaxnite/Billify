@@ -21,10 +21,14 @@ card_number, auth_code, get_spotify_link, metric) -%}
         <td class="name">
           <a
             href="{% if metric == 'tracks' %}
-                  {{ get_spotify_link(item.id, item.artists[0].name) }}
-                {% else %}
-                  {{ get_spotify_link(item.id) }}
-                {% endif %}"
+                    {{ get_spotify_link(item.id, item.artists[0].name) }}
+                  {% elif metric == 'genres' %}
+                    https://open.spotify.com/
+                  {% elif metric == 'stats' %}
+                    https://open.spotify.com/
+                  {% else %}
+                    {{ get_spotify_link(item.id) }}
+                  {% endif %}"
             target="_blank"
           >
             {{ item.name }} {% if metric == 'tracks' %} - {{
@@ -33,7 +37,11 @@ card_number, auth_code, get_spotify_link, metric) -%}
         </td>
         <td class="length amt">
           {% if metric == 'tracks' %} {{ item.duration_ms | mmss }} {% set
-          total_amt = total_amt + item.duration_ms %} {% else %} {{
+          total_amt = total_amt + item.duration_ms %} {% elif metric == 'genres'
+          %} {{ item.percentage | float | round(2) }}% {% set total_amt =
+          total_amt + item.percentage %} {% elif metric == 'stats' %} {{
+          item.value }} {% if item.value | float is not none %} {% set total_amt
+          = total_amt + (item.value | float) %} {% endif %} {% else %} {{
           item.popularity }} {% set total_amt = total_amt + item.popularity %}
           {% endif %}
         </td>
@@ -109,6 +117,8 @@ card_number, auth_code, get_spotify_link, metric) -%}
             parseInt(parts[1]) * 60 +
             parseInt(parts[2]);
         }
+      } else if ("{{ metric }}" === "genres") {
+        amtValue = parseFloat(amtText.replace("%", ""));
       } else {
         amtValue = parseInt(amtText);
       }
@@ -121,6 +131,10 @@ card_number, auth_code, get_spotify_link, metric) -%}
       document.getElementById("total-amt").textContent = `${minutes}:${
         seconds < 10 ? "0" : ""
       }${seconds}`;
+    } else if ("{{ metric }}" === "genres") {
+      document.getElementById("total-amt").textContent = `${totalAmt.toFixed(
+        2
+      )}%`;
     } else {
       document.getElementById("total-amt").textContent = totalAmt;
     }
