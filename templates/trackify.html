@@ -1,61 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <title>Trackify Receipt</title>
-  </head>
-  <body>
+    <!-- Reference the local html2canvas_min.js file -->
+    <script src="{{ url_for('static', filename='html2canvas_min.js') }}"></script>
+</head>
+<body>
     <div class="flex-container">
-      <div class="left-box">
-        <div class="receipt">
-          {% from 'macros.html' import receiptContainer %}
-          {{ receiptContainer(user_name, top_items, id, duration_text, currentTime, card_number, auth_code, get_spotify_link, metric) }}
+        <div class="left-box">
+            <div class="receipt">
+                {% from 'macros.html' import receiptContainer %}
+                {{ receiptContainer(user_name, top_items, id, duration_text, currentTime, card_number, auth_code, get_spotify_link, metric) }}
+            </div>
+            <button id="save-image-button">Save Image</button>
         </div>
-      </div>
-      <div class="right-box">
-        <h1>Welcome, {{ user_name }}</h1>
-        <h2>Here's your Custom Trackify Receipt</h2>
-        <h3>Metrics</h3>
-        <form id="metricForm" action="/trackify" method="post">
-          <select class="select-dropdown" name="metric" onchange="this.form.submit()">
-            <option value="tracks" {% if metric == 'tracks' %}selected{% endif %}>Top Tracks</option>
-            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Artists</option>
-            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Podcasts</option>
-            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Genres</option>
-            <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Stats</option>
-          </select>
-        </form>
-        <h3>Time Period</h3>
-        <div class="time-button-container">
-          <form id="durationForm" action="/trackify" method="post">
-            <input type="hidden" name="metric" value="{{ metric }}">
-            <button type="submit" name="duration" value="short_term" class="time-button {% if duration == 'short_term' %}active{% endif %}">
-              Last Month
-            </button>
-            <button type="submit" name="duration" value="medium_term" class="time-button {% if duration == 'medium_term' %}active{% endif %}">
-              Last 6 Months
-            </button>
-            <button type="submit" name="duration" value="long_term" class="time-button {% if duration == 'long_term' %}active{% endif %}">
-              Last Year
-            </button>
-          </form>
+        <div class="right-box">
+            {% if user_name == 'ishi' %}
+                <h1>salut tournesol, bienvenue sur le projet d'bleu </h1>
+            {% elif user_name == 'leomarra2002' %}
+                <h1>Ciao Nardo,Sei pronto a farti esplodere la mente?</h1>
+            {% else %}
+                <h1>Welcome, {{ user_name }}!</h1>
+            {% endif %}
+            <h2>Here's your Custom Trackify Receipt</h2>
+            <h3>Metrics</h3>
+            <form id="metricForm" action="/trackify" method="post">
+                <select class="select-dropdown" name="metric" onchange="this.form.submit()">
+                    <option value="tracks" {% if metric == 'tracks' %}selected{% endif %}>Top Tracks</option>
+                    <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Artists</option>
+                    <option value="genres" {% if metric == 'genres' %}selected{% endif %}>Top Genres</option>
+                    <option value="stats" {% if metric == 'stats' %}selected{% endif %}>Stats</option>
+                </select>
+            </form>
+            <h3>Time Period</h3>
+            <div class="time-button-container">
+                <form id="durationForm" action="/trackify" method="post">
+                    <input type="hidden" name="metric" value="{{ metric }}">
+                    <input type="hidden" name="limit" value="{{ limit }}">
+                    <button type="submit" name="duration" value="short_term" class="time-button {% if duration == 'short_term' %}active{% endif %}">Last Month</button>
+                    <button type="submit" name="duration" value="medium_term" class="time-button time-button-2 {% if duration == 'medium_term' %}active{% endif %}">Last 6 Months</button>
+                    <button type="submit" name="duration" value="long_term" class="time-button {% if duration == 'long_term' %}active{% endif %}">Last Year</button>
+                </form>
+            </div>
+            <h3>Top Items</h3>
+            <div class="length-button-container">
+                <form id="lengthForm" action="/trackify" method="post">
+                    <input type="hidden" name="metric" value="{{ metric }}">
+                    <input type="hidden" name="duration" value="{{ duration }}">
+                    <button type="submit" name="limit" value="10" class="length-button {% if limit == 10 %}active{% endif %}">Top 10</button>
+                    <button type="submit" name="limit" value="20" class="length-button length-button-2 {% if limit == 20 %}active{% endif %}">Top 20</button>
+                    <button type="submit" name="limit" value="30" class="length-button {% if limit == 30 %}active{% endif %}">Top 30</button>
+                </form>
+            </div>
+            <h3>Description</h3>
+            <div class="description">
+              {% if metric == 'tracks' %}
+                  <p>Your top tracks show the songs you've listened to the most over the selected period.</p>
+                  <p><span class="bold">QTY</span> - The ranking of a track in your most played. The higher up on the list, the more you have listened to it.</p>
+                  <p><span class="bold">AMT</span> - The length of the song.</p>
+              {% elif metric == 'artists' %}
+                  <p>Your top artists represent the musicians you've enjoyed the most.</p>
+                  <p><span class="bold">QTY</span> - The ranking of an artist in your most played. The higher up on the list, the more played it is.</p>
+                  <p><span class="bold">AMT</span> - The popularity of an artist, from 0-100. Where 100 is the most popular, while 0 is the least popular.</p>
+              {% elif metric == 'genres' %}
+                  <p>Your top genres highlight the styles of music you listen to most frequently.</p>
+                  <p><span class="bold">QTY</span> - The ranking of a genre in your most played artists.</p>
+                  <p><span class="bold">AMT</span> - The % of your top artists that a genre appears in. For example, 25% means that 25% of your top artists fall under the genre.</p>
+              {% elif metric == 'podcasts' %}
+                  <p>Your top podcasts show the episodes you've listened to the most.</p>
+                  <p><span class="bold">QTY</span> - The ranking of a genre in your most played artists.</p>
+                  <p><span class="bold">AMT</span> - The % of your top artists that a genre appears in. For example, 25% means that 25% of your top artists fall under the genre.</p>
+              {% elif metric == 'stats' %}
+                <p>Your stats give a detailed breakdown of your listening habits.</p>
+                <p><span class="bold">Popularity Score</span> - The average popularity score of your top 50 artists, from 0-100. The lower the number, the more "obscure" your music taste is.</p>
+                <p><span class="bold">Average Track Age</span> - The average number of years since release of each of your top tracks. The higher this number, the "older" your music taste is.</p>
+                <p><span class="bold">Tempo</span> - The average BPM of your top tracks.</p>                
+                <p><span class="bold">Happiness</span> - A measure from 0 to 100 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).</p>                
+                <p><span class="bold">Danceability</span> - Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0 is least danceable and 100 is most danceable.</p>
+                <p><span class="bold">Energy</span> - The average "energy level" of your top tracks out of 100. Typically, energetic tracks feel fast, loud, and noisy. The higher this number is, the more energetic your music is.</p> 
+                <p><span class="bold">Acousticness</span> - This value describes how acoustic a song is. A score of 100 means the song is most likely to be an acoustic one.</p>
+                <p><span class="bold">Instrumentalness</span> - Predicts whether a track contains no vocals. "Ooh" and "aah" sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly "vocal". The closer the instrumentalness value is to 100, the greater likelihood the track contains no vocal content. Values above 50 are intended to represent instrumental tracks.</p>
+              {% endif %}
+          </div>
         </div>
-      </div>
     </div>
     <div class="space"></div>
 
     <script>
-      // Add event listener to each button to toggle active class
-      document.querySelectorAll(".time-button").forEach((button) => {
-        button.addEventListener("click", function () {
-          document
-            .querySelectorAll(".time-button")
-            .forEach((btn) => btn.classList.remove("active"));
-          this.classList.add("active");
+        document.querySelectorAll(".time-button, .length-button").forEach((button) => {
+            button.addEventListener("click", function () {
+                const buttonType = this.classList.contains("time-button") ? ".time-button" : ".length-button";
+                document.querySelectorAll(buttonType).forEach((btn) => btn.classList.remove("active"));
+                this.classList.add("active");
+            });
         });
-      });
+
+        document.getElementById('save-image-button').addEventListener('click', function() {
+            html2canvas(document.querySelector(".receipt")).then(canvas => {
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL("image/png");
+
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = '{{ user_name }}_receipt.png';
+
+                document.body.appendChild(img);
+                link.click();
+                document.body.removeChild(img);
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        });
     </script>
-  </body>
+</body>
 </html>
