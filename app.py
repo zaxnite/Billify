@@ -112,7 +112,7 @@ def login():
     return redirect(auth_url)
 
 
-@app.route('https://trackify-86c02d3ef29b.herokuapp.com/redirectPage')
+@app.route('/redirectPage')
 def redirectPage():
     sp_oauth = SpotifyOAuth(
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
