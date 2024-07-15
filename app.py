@@ -27,8 +27,9 @@ def format_duration(duration_ms):
     minutes, seconds = divmod(duration_ms // 1000, 60)
     return f"{minutes}:{seconds:02d}"
 
-
 # Register mmss filter with Jinja2 environment
+
+
 @app.template_filter('mmss')
 def _jinja2_filter_mmss(duration_ms):
     return format_duration(duration_ms)
@@ -48,8 +49,9 @@ def generate_random_card_number():
 def generate_random_auth_code():
     return f"{random.randint(100000, 999999)}"
 
-
 # Custom filter function to format dates
+
+
 @app.template_filter('strftime')
 def _jinja2_filter_datetime(date, fmt=None):
     if isinstance(date, str):
@@ -109,6 +111,7 @@ def login():
     sp_oauth = SpotifyOAuth(
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
     auth_url = sp_oauth.get_authorize_url()
+    print(f"Auth URL: {auth_url}")  # Add this line for debugging
     return redirect(auth_url)
 
 
