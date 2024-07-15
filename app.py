@@ -16,7 +16,7 @@ TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
 
 # # Hard-coded redirect URI
-REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/trackify'
+REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/redirectPage'
 
 
 # def get_redirect_uri():
@@ -184,44 +184,30 @@ def login():
     return redirect(auth_url)
 
 
-# @app.route('/redirectPage')
-# def redirectPage():
-#     print("Reached /redirectPage endpoint")  # Debug print
-#     print(request.args)  # Print incoming request arguments
-#     sp_oauth = SpotifyOAuth(
-#         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
-#     session.clear()
-#     code = request.args.get('code')
-#     print(f"Redirected to /redirectPage with code: {code}")  # Debug print
-#     print(f"Full request URL: {request.url}")  # Debug print
-#     if code is None:
-#         return "Error: Missing code parameter"
-#     try:
-#         token_info = sp_oauth.get_access_token(code)
-#         print(f"Token info: {token_info}")  # Debug print
-#         session[TOKEN_INFO] = token_info
-#     except Exception as e:
-#         print(f"Error obtaining token: {e}")  # Debug print
-#         return f"Error obtaining token: {e}"
-#     return redirect(url_for('trackify'))
+@app.route('/redirectPage')
+def redirectPage():
+    print("Reached /redirectPage endpoint")  # Debug print
+    print(request.args)  # Print incoming request arguments
+    sp_oauth = SpotifyOAuth(
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+    session.clear()
+    code = request.args.get('code')
+    print(f"Redirected to /redirectPage with code: {code}")  # Debug print
+    print(f"Full request URL: {request.url}")  # Debug print
+    if code is None:
+        return "Error: Missing code parameter"
+    try:
+        token_info = sp_oauth.get_access_token(code)
+        print(f"Token info: {token_info}")  # Debug print
+        session[TOKEN_INFO] = token_info
+    except Exception as e:
+        print(f"Error obtaining token: {e}")  # Debug print
+        return f"Error obtaining token: {e}"
+    return redirect(url_for('trackify'))
 
 
 @app.route('/trackify', methods=['GET', 'POST'])
 def trackify():
-    # Handle the OAuth code exchange
-    code = request.args.get('code')
-    if code:
-        sp_oauth = SpotifyOAuth(
-            client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
-        try:
-            token_info = sp_oauth.get_access_token(code)
-            print(f"Token info: {token_info}")  # Debug print
-            session[TOKEN_INFO] = token_info
-        except Exception as e:
-            print(f"Error obtaining token: {e}")  # Debug print
-            return f"Error obtaining token: {e}"
-
-    # Get token info from the session
     token_info = get_token()
     if not token_info:
         return redirect(url_for('login'))
