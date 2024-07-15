@@ -15,8 +15,9 @@ TOKEN_INFO = 'token_info'
 # Spotify Authentication Scopes
 SCOPE = 'user-top-read'
 
-# Hard-coded redirect URI
-REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/redirectPage'
+
+def get_redirect_uri():
+    return url_for('redirectPage', _external=True)
 
 
 def format_duration(duration_ms):
@@ -68,7 +69,7 @@ def get_token():
 
     if is_expired:
         sp_oauth = SpotifyOAuth(
-            client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+            client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
         token_info = sp_oauth.get_cached_token()
         if not token_info:
             return None  # Token could not be refreshed
@@ -103,7 +104,7 @@ def home():
 @app.route('/login')
 def login():
     sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
@@ -111,7 +112,7 @@ def login():
 @app.route('/redirectPage')
 def redirectPage():
     sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
     session.clear()
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
