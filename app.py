@@ -103,32 +103,6 @@ def get_spotify_artist_link(artist_id):
     return f"https://open.spotify.com/artist/{artist_id}"
 
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-def login():
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
-    auth_url = sp_oauth.get_authorize_url()
-    print(f"Auth URL: {auth_url}")  # Debug print
-    return redirect(auth_url)
-
-
-@app.route('/redirectPage')
-def redirectPage():
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
-    session.clear()
-    code = request.args.get('code')
-    token_info = sp_oauth.get_access_token(code)
-    print(f"Received code: {code}")  # Debug print
-    print(f"Token info: {token_info}")  # Debug print
-    session[TOKEN_INFO] = token_info
-    return redirect(url_for('trackify'))
-
-
 def get_duration_from_button():
     duration = request.form.get('duration', 'medium_term')
     return duration
@@ -188,6 +162,33 @@ def calculate_insights(sp, top_tracks):
         insights['instrumentalness'] /= num_tracks
 
     return insights
+
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+@app.route('/login')
+def login():
+    sp_oauth = SpotifyOAuth(
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
+    auth_url = sp_oauth.get_authorize_url()
+    print(f"Auth URL: {auth_url}")  # Debug print
+    return redirect(auth_url)
+
+
+@app.route('/redirectPage')
+def redirectPage():
+    sp_oauth = SpotifyOAuth(
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
+    session.clear()
+    code = request.args.get('code')
+    token_info = sp_oauth.get_access_token(code)
+    print(f"Received code: {code}")  # Debug print
+    print(f"Token info: {token_info}")  # Debug print
+    session[TOKEN_INFO] = token_info
+    return redirect(url_for('trackify'))
 
 
 @app.route('/trackify', methods=['GET', 'POST'])
