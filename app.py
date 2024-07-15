@@ -184,7 +184,8 @@ def redirectPage():
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
     session.clear()
     code = request.args.get('code')
-    print(f"Received code: {code}")  # Debug print
+    print(f"Redirected to /redirectPage with code: {code}")  # Debug print
+    print(f"Full request URL: {request.url}")  # Debug print
     if code is None:
         return "Error: Missing code parameter"
     try:
