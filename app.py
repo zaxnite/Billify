@@ -186,6 +186,7 @@ def login():
 
 @app.route('/redirectPage')
 def redirectPage():
+    print("Reached /redirectPage endpoint")  # Debug print
     sp_oauth = SpotifyOAuth(
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
     session.clear()
