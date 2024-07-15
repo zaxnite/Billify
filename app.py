@@ -95,7 +95,7 @@ def get_spotify_artist_link(artist_id):
     return f"https://open.spotify.com/artist/{artist_id}"
 
 
-@app.route('/')
+@app.route('/home')
 def home():
     return render_template('index.html')
 
