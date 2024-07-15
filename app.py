@@ -204,12 +204,6 @@ def redirectPage():
     return redirect(url_for('trackify'))
 
 
-@app.route('/<path:path>')
-def catch_all(path):
-    print(f"Caught a request to: {path}")
-    return f"Caught a request to: {path}", 404
-
-
 @app.route('/trackify', methods=['GET', 'POST'])
 def trackify():
     token_info = get_token()
