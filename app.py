@@ -20,7 +20,9 @@ SCOPE = 'user-top-read'
 
 
 def get_redirect_uri():
-    return url_for('redirectPage', _external=True)
+    redirect_uri = url_for('redirectPage', _external=True)
+    print(f"Generated redirect_uri: {redirect_uri}")  # Debug print
+    return redirect_uri
 
 
 def format_duration(duration_ms):
@@ -106,12 +108,11 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/login')
 def login():
     sp_oauth = SpotifyOAuth(
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
     auth_url = sp_oauth.get_authorize_url()
-    print(f"Auth URL: {auth_url}")  # Add this line for debugging
+    print(f"Auth URL: {auth_url}")  # Debug print
     return redirect(auth_url)
 
 
@@ -122,6 +123,8 @@ def redirectPage():
     session.clear()
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
+    print(f"Received code: {code}")  # Debug print
+    print(f"Token info: {token_info}")  # Debug print
     session[TOKEN_INFO] = token_info
     return redirect(url_for('trackify'))
 
