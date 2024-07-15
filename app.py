@@ -195,7 +195,6 @@ def redirectPage():
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
     # Clear session and cache
     session.clear()
-    sp_oauth.cache_handler.clear_token()
     code = request.args.get('code')
     print(f"Redirected to /redirectPage with code: {code}")  # Debug print
     print(f"Full request URL: {request.url}")  # Debug print
