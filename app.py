@@ -6,6 +6,7 @@ from datetime import datetime
 import random
 from collections import Counter
 from credentials import CLIENT_ID, CLIENT_SECRET, SECRET_KEY
+import os
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -19,10 +20,11 @@ SCOPE = 'user-top-read'
 REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/redirectPage'
 
 
-# def get_redirect_uri():
-#     redirect_uri = url_for('redirectPage', _external=True)
-#     print(f"Generated redirect_uri: {redirect_uri}")  # Debug print
-#     return redirect_uri
+def clear_cache():
+    try:
+        os.remove(".cache")
+    except OSError as e:
+        print(f"Error deleting .cache file: {e}")
 
 
 def format_duration(duration_ms):
@@ -177,6 +179,7 @@ def home():
 
 @app.route('/login')
 def login():
+    clear_cache()
     sp_oauth = SpotifyOAuth(
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
     auth_url = sp_oauth.get_authorize_url()
@@ -190,7 +193,9 @@ def redirectPage():
     print(request.args)  # Print incoming request arguments
     sp_oauth = SpotifyOAuth(
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+    # Clear session and cache
     session.clear()
+    sp_oauth.cache_handler.clear_token()
     code = request.args.get('code')
     print(f"Redirected to /redirectPage with code: {code}")  # Debug print
     print(f"Full request URL: {request.url}")  # Debug print
