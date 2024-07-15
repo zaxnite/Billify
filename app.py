@@ -184,10 +184,16 @@ def redirectPage():
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=get_redirect_uri(), scope=SCOPE)
     session.clear()
     code = request.args.get('code')
-    token_info = sp_oauth.get_access_token(code)
     print(f"Received code: {code}")  # Debug print
-    print(f"Token info: {token_info}")  # Debug print
-    session[TOKEN_INFO] = token_info
+    if code is None:
+        return "Error: Missing code parameter"
+    try:
+        token_info = sp_oauth.get_access_token(code)
+        print(f"Token info: {token_info}")  # Debug print
+        session[TOKEN_INFO] = token_info
+    except Exception as e:
+        print(f"Error obtaining token: {e}")  # Debug print
+        return f"Error obtaining token: {e}"
     return redirect(url_for('trackify'))
 
 
