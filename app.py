@@ -15,16 +15,23 @@ TOKEN_INFO = 'token_info'
 # Spotify Authentication Scopes
 SCOPE = 'user-top-read'
 
-# Hard-coded redirect URI
+# # Hard-coded redirect URI
 REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/redirectPage'
+
+
+# def get_redirect_uri():
+#     redirect_uri = url_for('redirectPage', _external=True)
+#     print(f"Generated redirect_uri: {redirect_uri}")  # Debug print
+#     return redirect_uri
 
 
 def format_duration(duration_ms):
     minutes, seconds = divmod(duration_ms // 1000, 60)
     return f"{minutes}:{seconds:02d}"
 
-
 # Register mmss filter with Jinja2 environment
+
+
 @app.template_filter('mmss')
 def _jinja2_filter_mmss(duration_ms):
     return format_duration(duration_ms)
@@ -44,8 +51,9 @@ def generate_random_card_number():
 def generate_random_auth_code():
     return f"{random.randint(100000, 999999)}"
 
-
 # Custom filter function to format dates
+
+
 @app.template_filter('strftime')
 def _jinja2_filter_datetime(date, fmt=None):
     if isinstance(date, str):
@@ -93,30 +101,6 @@ def get_spotify_track_link(track_name, artist_name):
 
 def get_spotify_artist_link(artist_id):
     return f"https://open.spotify.com/artist/{artist_id}"
-
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@app.route('/login')
-def login():
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
-    auth_url = sp_oauth.get_authorize_url()
-    return redirect(auth_url)
-
-
-@app.route('/redirectPage')
-def redirectPage():
-    sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
-    session.clear()
-    code = request.args.get('code')
-    token_info = sp_oauth.get_access_token(code)
-    session[TOKEN_INFO] = token_info
-    return redirect(url_for('trackify'))
 
 
 def get_duration_from_button():
@@ -178,6 +162,48 @@ def calculate_insights(sp, top_tracks):
         insights['instrumentalness'] /= num_tracks
 
     return insights
+
+
+@app.route('/<path:path>')
+def catch_all(path):
+    print(f"Caught a request to: {path}")
+    return f"Caught a request to: {path}", 404
+
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+@app.route('/login')
+def login():
+    sp_oauth = SpotifyOAuth(
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+    auth_url = sp_oauth.get_authorize_url()
+    print(f"Auth URL: {auth_url}")  # Debug print
+    return redirect(auth_url)
+
+
+@app.route('/redirectPage')
+def redirectPage():
+    print("Reached /redirectPage endpoint")  # Debug print
+    print(request.args)  # Print incoming request arguments
+    sp_oauth = SpotifyOAuth(
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+    session.clear()
+    code = request.args.get('code')
+    print(f"Redirected to /redirectPage with code: {code}")  # Debug print
+    print(f"Full request URL: {request.url}")  # Debug print
+    if code is None:
+        return "Error: Missing code parameter"
+    try:
+        token_info = sp_oauth.get_access_token(code)
+        print(f"Token info: {token_info}")  # Debug print
+        session[TOKEN_INFO] = token_info
+    except Exception as e:
+        print(f"Error obtaining token: {e}")  # Debug print
+        return f"Error obtaining token: {e}"
+    return redirect(url_for('trackify'))
 
 
 @app.route('/trackify', methods=['GET', 'POST'])
