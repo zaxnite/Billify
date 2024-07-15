@@ -164,6 +164,12 @@ def calculate_insights(sp, top_tracks):
     return insights
 
 
+@app.route('/<path:path>')
+def catch_all(path):
+    print(f"Caught a request to: {path}")
+    return f"Caught a request to: {path}", 404
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -196,6 +202,12 @@ def redirectPage():
         print(f"Error obtaining token: {e}")  # Debug print
         return f"Error obtaining token: {e}"
     return redirect(url_for('trackify'))
+
+
+@app.route('/<path:path>')
+def catch_all(path):
+    print(f"Caught a request to: {path}")
+    return f"Caught a request to: {path}", 404
 
 
 @app.route('/trackify', methods=['GET', 'POST'])
