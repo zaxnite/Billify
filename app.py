@@ -5,13 +5,7 @@ import time
 from datetime import datetime
 import random
 from collections import Counter
-import os
-
-
-# Get credentials from environment variables
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
-SECRET_KEY = os.getenv('SECRET_KEY')
+from credentials import CLIENT_ID, CLIENT_SECRET, SECRET_KEY
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -21,20 +15,29 @@ TOKEN_INFO = 'token_info'
 # Spotify Authentication Scopes
 SCOPE = 'user-top-read'
 
+# Hard-coded redirect URI
+REDIRECT_URI = 'http://localhost:5000/redirectPage'
+
 
 def format_duration(duration_ms):
     minutes, seconds = divmod(duration_ms // 1000, 60)
     return f"{minutes}:{seconds:02d}"
 
 
+# Register mmss filter with Jinja2 environment
 @app.template_filter('mmss')
 def _jinja2_filter_mmss(duration_ms):
     return format_duration(duration_ms)
 
 
 def generate_random_card_number():
+    # Generate the first 12 digits as asterisks
     first_part = '**** **** *** '
+
+    # Generate the last 4 digits randomly
     last_part = ''.join(str(random.randint(0, 9)) for _ in range(4))
+
+    # Concatenate and return the full card number
     return f"{first_part}{last_part}"
 
 
@@ -42,13 +45,14 @@ def generate_random_auth_code():
     return f"{random.randint(100000, 999999)}"
 
 
+# Custom filter function to format dates
 @app.template_filter('strftime')
 def _jinja2_filter_datetime(date, fmt=None):
     if isinstance(date, str):
         try:
             date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ')
         except ValueError:
-            return date
+            return date  # Return original date if parsing fails
     if isinstance(date, datetime):
         return date.strftime(fmt) if fmt else date
     return ''
@@ -64,10 +68,10 @@ def get_token():
 
     if is_expired:
         sp_oauth = SpotifyOAuth(
-            client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=url_for('redirectPage', _external=True), scope=SCOPE)
+            client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
         token_info = sp_oauth.get_cached_token()
         if not token_info:
-            return None
+            return None  # Token could not be refreshed
         session[TOKEN_INFO] = token_info
 
     return token_info
@@ -99,7 +103,7 @@ def home():
 @app.route('/login')
 def login():
     sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=url_for('redirectPage', _external=True), scope=SCOPE)
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
@@ -107,7 +111,7 @@ def login():
 @app.route('/redirectPage')
 def redirectPage():
     sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=url_for('redirectPage', _external=True), scope=SCOPE)
+        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
     session.clear()
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
@@ -186,6 +190,7 @@ def trackify():
     user_info = sp.current_user()
     user_name = user_info['display_name']
 
+    # Get the duration and limit from the form submission
     duration = get_duration_from_button()
     limit = get_limit_from_button()
     metric = request.form.get('metric', 'tracks')
@@ -202,22 +207,24 @@ def trackify():
         id = "top_tracks"
         top_data = sp.current_user_top_tracks(limit=limit, time_range=duration)
         top_items = top_data['items']
-        get_spotify_link = get_spotify_track_link
+        get_spotify_link = get_spotify_track_link  # Assign the function reference
     elif metric == 'genres':
         id = "top_genres"
         top_artists_data = sp.current_user_top_artists(
-            limit=50, time_range=duration)
+            limit=50, time_range=duration)  # Fetch top 50 artists
         top_artists = top_artists_data['items']
 
         genre_counter = Counter()
         for artist in top_artists:
             genre_counter.update(artist['genres'])
 
+        # Limit the genres based on the number of top artists
         limited_genres = genre_counter.most_common(limit)
         total_artists = len(top_artists)
-        top_items = [{'name': genre, 'count': count, 'percentage': (
-            count / total_artists) * 100} for genre, count in limited_genres]
+        top_items = [{'name': genre, 'count': count, 'percentage': (count / total_artists) * 100}
+                     for genre, count in limited_genres]
 
+        # No direct link for genres
         def get_spotify_link(name, _): return 'https://open.spotify.com/'
 
     elif metric == 'stats':
@@ -226,6 +233,7 @@ def trackify():
         top = top_data['items']
         insights = calculate_insights(sp, top)
 
+        # Prepare insights for rendering
         top_items = [
             {'name': 'Popularity Score',
                 'value': f"{insights['popularity_score']:.2f}/100"},
@@ -242,6 +250,7 @@ def trackify():
                 'value': f"{insights['instrumentalness']:.2f}"}
         ]
 
+        # No direct link for stats
         def get_spotify_link(name, _): return 'https://open.spotify.com/'
 
     else:
@@ -249,7 +258,7 @@ def trackify():
         top_data = sp.current_user_top_artists(
             limit=limit, time_range=duration)
         top_items = top_data['items']
-        get_spotify_link = get_spotify_artist_link
+        get_spotify_link = get_spotify_artist_link  # Assign the function reference
 
     current_time = datetime.now().strftime('%A, %B %d, %Y')
 
