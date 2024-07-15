@@ -16,7 +16,7 @@ TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
 
 # Hard-coded redirect URI
-REDIRECT_URI = 'http://localhost:5000/redirectPage'
+REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/redirectPage'
 
 
 def format_duration(duration_ms):
