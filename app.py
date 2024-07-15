@@ -95,12 +95,12 @@ def get_spotify_artist_link(artist_id):
     return f"https://open.spotify.com/artist/{artist_id}"
 
 
-@app.route('/home')
+@app.route('https://trackify-2024-ba5a0756e4ab.herokuapp.com/')
 def home():
     return render_template('index.html')
 
 
-@app.route('/login')
+@app.route('https://trackify-2024-ba5a0756e4ab.herokuapp.com/login')
 def login():
     sp_oauth = SpotifyOAuth(
         client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
