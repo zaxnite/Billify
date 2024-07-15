@@ -16,7 +16,7 @@ TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
 
 # Hard-coded redirect URI
-REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/redirectPage'
+REDIRECT_URI = 'https://trackify.herokuapp.com/redirectPage'
 
 
 def get_redirect_uri():
