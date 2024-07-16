@@ -17,7 +17,7 @@ TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
 
 # # Hard-coded redirect URI
-REDIRECT_URI = 'https://trackify-86c02d3ef29b.herokuapp.com/redirectPage'
+REDIRECT_URI = 'https://listify-7e3513f08cf5.herokuapp.com/redirectPage'
 
 
 def clear_cache():
