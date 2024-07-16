@@ -207,11 +207,11 @@ def redirectPage():
     except Exception as e:
         print(f"Error obtaining token: {e}")  # Debug print
         return f"Error obtaining token: {e}"
-    return redirect(url_for('trackify'))
+    return redirect(url_for('listify'))
 
 
-@app.route('/trackify', methods=['GET', 'POST'])
-def trackify():
+@app.route('/listify', methods=['GET', 'POST'])
+def listify():
     token_info = get_token()
     if not token_info:
         return redirect(url_for('login'))
@@ -295,7 +295,7 @@ def trackify():
     random_card_number = generate_random_card_number()
     random_auth_code = generate_random_auth_code()
 
-    return render_template('trackify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
+    return render_template('listify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
                            duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
                            auth_code=random_auth_code, get_spotify_link=get_spotify_link, metric=metric, limit=limit)
 
