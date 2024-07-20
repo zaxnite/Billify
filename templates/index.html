@@ -17,16 +17,16 @@
   <body>
     <nav>
       <div class="logo">
-        <p>Logo</p>
+        <p>Listify</p>
       </div>
-      <ul>
+      <ul id="menuList">
         <li><a href="{{ url_for('home') }}">Home</a></li>
         <li><a href="{{ url_for('about') }}">About</a></li>
         <li><a href="{{ url_for('privacy') }}">Privacy Policy</a></li>
         <li><a href="{{ url_for('contact') }}">Contact</a></li>
       </ul>
       <div class="menu-icon">
-        <i class="fa-solid fa-bars"></i>
+        <i class="fa-solid fa-bars" onclick="toggleMenu()"></i>
       </div>
     </nav>
     <div class="center">
