@@ -23,7 +23,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: greenyellow;
+  background: #19b14e;
   position: relative;
   height: 75px;
 }
@@ -40,6 +40,15 @@ nav ul li {
 nav ul li a {
   text-decoration: none;
   color: #fff;
+}
+
+.menu-icon {
+  display: none;
+}
+
+.menu-icon i {
+  color: #fff;
+  font-size: 30px;
 }
 
 /* Centering content within the viewport */
@@ -393,4 +402,24 @@ td.name {
 
 .thanks {
   text-align: center;
+}
+
+@media (max-width: 600px) {
+  nav ul {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    text-align: center;
+    background: #19b14e;
+  }
+
+  nav ul li {
+    padding: 20px;
+  }
+
+  .menu-icon {
+    display: block;
+  }
 }
