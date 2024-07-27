@@ -370,6 +370,10 @@ header {
   text-align: center; /* Center text within .center */
 }
 
+.center h2 a {
+  text-decoration: none;
+}
+
 .center h1 {
   color: #333; /* Adjust color as needed */
   margin: 0px;
@@ -377,6 +381,15 @@ header {
 }
 
 .center h2 {
+  color: #666; /* Adjust color as needed */
+  margin-bottom: 20px; /* Optional: Add more space below h2 */
+  font-weight: bold;
+  margin-top: 10px;
+  width: 55%;
+  line-height: 2;
+}
+
+.center h2 .index {
   color: #666; /* Adjust color as needed */
   margin-bottom: 20px; /* Optional: Add more space below h2 */
   font-weight: bold;
