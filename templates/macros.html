@@ -1,7 +1,7 @@
 {% macro receiptContainer(display_name, items, id, duration, currentTime,
 card_number, auth_code, get_spotify_link, metric) -%}
 <div class="receiptContainer" id="{{ id }}">
-  <p class="logo">LISTIFY</p>
+  <p class="logo">BILLIFY</p>
   <p class="period">{{ duration }}</p>
   <p class="order">ORDER #{{ orderNumber }}</p>
   <p class="date date2">{{ currentTime }}</p>
@@ -67,7 +67,7 @@ card_number, auth_code, get_spotify_link, metric) -%}
       style="width: 80%"
       src="{{ url_for('static', filename='barcode.png') }}"
     />
-    <p class="website">Listify.com by Aathif Khan</p>
+    <p class="website">billify.com by Aathif Khan</p>
     <img
       style="width: 40%; padding-top: 20px"
       src="{{ url_for('static', filename='Spotify_Logo_RGB_Black.png') }}"

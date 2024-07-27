@@ -8,6 +8,8 @@ html {
   margin: 0;
   padding: 0;
   height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 body {
@@ -18,53 +20,359 @@ body {
   background-color: #fff;
 }
 
-nav {
-  padding: 10px 30px;
+body.scroll {
+  overflow: auto;
+}
+
+/* Ensure wrapper uses flexbox layout */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full height */
+}
+
+/* Allow center to grow and take available space */
+.center {
+  flex: 1;
+  padding-bottom: 50px;
+}
+
+/* Ensure footer sticks to the bottom */
+footer {
+  display: flex;
+  background-color: #3a9961; /* Example background color */
+  min-height: 100px;
+  position: relative; /* Ensure relative positioning */
+  width: 100%;
+  margin-top: auto; /* Push footer to the bottom */
+  padding: 20px 0px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+footer .social_icon,
+footer .menu {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 8px 0;
+  flex-wrap: wrap;
+  padding-right: 25px;
+}
+
+footer .social_icon li,
+footer .menu li {
+  list-style: none;
+}
+
+footer .social_icon i {
+  font-size: 2em;
+  color: white;
+  margin: 0 10px;
+  display: inline-block;
+  transition: 0.5s;
+}
+
+footer .social_icon i:hover {
+  transform: translateY(-10px);
+}
+
+footer .menu li a {
+  padding-top: 10px;
+  font-size: 1.2em;
+  color: white;
+  margin: 0 10px;
+  display: inline-block;
+  transition: 0.5s;
+  text-decoration: none;
+  opacity: 0.75;
+}
+
+footer .menu li a:hover {
+  opacity: 1;
+  transform: translateY(-8px);
+}
+
+footer p {
+  color: white;
+  text-align: center;
+  margin-top: 7.5px;
+  margin-bottom: 5px;
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+footer .wave {
+  position: absolute;
+  top: -80px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url(../static/wave.png);
+  background-size: 1000px 100px;
+}
+
+footer .wave#wave1 {
+  z-index: 1000;
+  opacity: 1;
+  bottom: 0;
+  animation: animateWave 4s linear infinite;
+}
+
+footer .wave#wave2 {
+  z-index: 999;
+  opacity: 0.5;
+  bottom: 10px;
+  animation: animateWave_02 4s linear infinite;
+}
+
+footer .wave#wave3 {
+  z-index: 1000;
+  opacity: 0.2;
+  bottom: 15px;
+  animation: animateWave 4s linear infinite;
+}
+
+footer .wave#wave4 {
+  z-index: 999;
+  opacity: 0.7;
+  bottom: 20px;
+  animation: animateWave_02 4s linear infinite;
+}
+
+@keyframes animateWave {
+  0% {
+    background-position-x: 1000px;
+  }
+
+  100% {
+    background-position-x: 0px;
+  }
+}
+
+@keyframes animateWave_02 {
+  0% {
+    background-position-x: 0px;
+  }
+
+  100% {
+    background-position-x: 1000px;
+  }
+}
+
+header {
+  position: relative;
+  padding: 0 2rem;
+}
+
+.navbar {
+  width: 100%;
+  height: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
+  padding-top: 12px;
   justify-content: space-between;
-  background: #19b14e;
-  position: relative;
-  height: 55px;
 }
 
-nav ul {
-  display: flex;
-  gap: 30px;
-}
-
-nav ul li {
-  list-style-type: none;
-}
-
-nav ul li a {
-  text-decoration: none;
-  color: #fff;
-}
-
-.menu-icon {
+.navbar .toggle_btn {
+  color: black;
+  font-size: 1.5rem;
+  cursor: pointer;
   display: none;
 }
 
-.menu-icon i {
-  color: #fff;
-  font-size: 30px;
+.navbar li {
+  list-style: none;
 }
 
-/* Centering content within the viewport */
+.navbar a {
+  text-decoration: none;
+  color: #1db954;
+  font-weight: bold;
+  letter-spacing: 2px;
+  position: relative;
+  display: inline-block;
+  transition: all 1s;
+}
+
+.navbar .links {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.navbar .links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  font: bold 1rem sans-serif; /* Reduced font size */
+  text-transform: uppercase;
+}
+
+.navbar .links li {
+  padding: 0 0.5em 0.25em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.navbar .links li a {
+  text-decoration: none;
+  color: inherit;
+  padding: 5px 15px;
+  font-weight: bold;
+  letter-spacing: 2.2px;
+  color: rgb(110, 122, 136);
+  border-radius: 10px;
+  position: relative;
+  display: inline-block;
+  background: transparent;
+  transition: color 0.4s;
+}
+
+.navbar .links li a:hover {
+  color: #000; /* Full black on hover */
+}
+
+.navbar .links .active {
+  color: #000; /* Full black on hover */
+}
+
+.navbar .links li::before {
+  content: "";
+  position: absolute;
+  inset: calc(100% - 3px) 0 0 0;
+  background: #19b14e; /* Green color */
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.navbar .links li:hover::before {
+  transform: scaleX(1);
+}
+
+.navbar .logo a {
+  font-size: 2rem; /* Base font size */
+  font-weight: bolder;
+  text-decoration: none;
+  color: #1db954;
+  letter-spacing: 2px;
+  position: relative;
+  display: inline-block;
+  transition: all 0.3s ease-in-out;
+}
+
+.navbar .logo a:hover {
+  font-size: 2.2rem; /* Increased font size on hover */
+  animation: slightGlow 0.3s infinite alternate;
+}
+
+@keyframes slightGlow {
+  0% {
+    text-shadow: 0 0 1px #1db934, 0 0 2px #1db934, 0 0 3px #1db934;
+  }
+  100% {
+    text-shadow: 0 0 1.5px #1db934, 0 0 2.5px #1db934, 0 0 3.5px #1db934;
+  }
+}
+
+.checkbox {
+  opacity: 0;
+  position: absolute;
+}
+
+.label {
+  height: 20px; /* Increased height slightly */
+  width: 50px; /* Increased width slightly */
+  background-image: linear-gradient(to right, #77c2d0, #3d91a7);
+  display: flex;
+  align-items: center;
+  padding: 6px; /* Increased padding slightly */
+  position: relative;
+  justify-content: space-between;
+  border-radius: 50px;
+  transition: background-image 0.5s ease;
+}
+
+.ball {
+  height: 24px; /* Increased height slightly */
+  width: 24px; /* Increased width slightly */
+  border-radius: 50%;
+  background-image: linear-gradient(to right, #fff500, #ffc700);
+  position: absolute;
+  top: 4px; /* Adjusted to match new size */
+  left: 3px; /* Adjusted to match new size */
+  transition: transform 0.5s linear, background-image 0.5s ease-in-out;
+  border: #000;
+  box-shadow: 0 0 2px #fff500, 0 0 5px #ffc700;
+  cursor: pointer;
+}
+
+.checkbox:checked + .label {
+  background-image: linear-gradient(to right, #041326, #0e314c);
+}
+
+.checkbox:checked + .label .ball {
+  transform: translateX(30px); /* Adjusted to match new size */
+  background-image: linear-gradient(to bottom right, #e5e0cf, #ddd8ca, #efead7);
+  box-shadow: 0 0 2px #e5e0cf, 0 0 5px #ddd8ca;
+}
+
+.dropdown_menu {
+  display: none;
+  position: absolute;
+  right: 2rem;
+  top: 60px;
+  height: 0px;
+  width: 300px;
+  background: #b9e4c8;
+  backdrop-filter: blur(15px);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  flex-direction: column; /* Ensure items are stacked vertically */
+  align-items: center; /* Center items horizontally */
+}
+
+.dropdown_menu li {
+  padding: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown_menu .action_btn {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Center text horizontally */
+  align-items: center; /* Center text vertically */
+  background-color: #19b14e;
+  text-align: center; /* Ensure text is centered */
+}
+
+.dropdown_menu.open {
+  height: 200px;
+}
+
 .center {
+  height: calc(100% - 200px); /* Subtract the height of the navbar */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Ensure full viewport height */
   font-family: "Inter", sans-serif;
   text-align: center; /* Center text within .center */
 }
 
 .center h1 {
   color: #333; /* Adjust color as needed */
-  margin-bottom: 10px; /* Optional: Add margin to separate from h2 */
+  margin: 0px;
   font-weight: bolder;
 }
 
@@ -72,23 +380,25 @@ nav ul li a {
   color: #666; /* Adjust color as needed */
   margin-bottom: 20px; /* Optional: Add more space below h2 */
   font-weight: bold;
+  margin-top: 10px;
 }
 
 .spotifyButton {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #1db954; /* Spotify green */
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
+  border: none;
   margin-top: 20px;
-  font-size: 20px;
-  cursor: pointer;
-  text-align: center;
+  padding: 15px 40px;
+  text-decoration: none;
+  color: white;
+  font-family: "montsrrat", sans-serif;
+  border-radius: 6px;
+  font-size: medium;
+  background-size: 200%;
+  background-image: linear-gradient(to left, #38e558, #009432, #026b25);
+  transition: 0.6s;
 }
 
 .spotifyButton:hover {
-  background-color: #1ed760;
+  background-position: right;
 }
 
 /* Flexbox container */
@@ -404,22 +714,64 @@ td.name {
   text-align: center;
 }
 
-@media (max-width: 600px) {
-  nav ul {
-    position: absolute;
-    top: 70px;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    text-align: center;
-    background: #19b14e;
+@media (max-width: 992px) {
+  .navbar .links,
+  .navbar .action_btn {
+    display: none;
   }
 
-  nav ul li {
-    padding: 20px;
-  }
-
-  .menu-icon {
+  .navbar .toggle_btn {
     display: block;
+  }
+
+  .dropdown_menu {
+    display: block;
+  }
+
+  .dropdown_menu .action_btn {
+    display: block;
+  }
+}
+
+@media (max-width: 576px) {
+  .dropdown_menu {
+    left: 2rem;
+    width: unset;
+  }
+}
+
+@media (max-width: 768px) {
+  .flex-container {
+    flex-direction: column; /* Stack the boxes vertically */
+    align-items: center; /* Center align the boxes */
+  }
+
+  .left-box,
+  .right-box {
+    margin: 0; /* Remove margins */
+    width: 100%; /* Make both boxes full width */
+    display: flex; /* Ensure flex properties are applied */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+  }
+
+  .left-box {
+    padding-bottom: 80px; /* Add some space between the boxes */
+  }
+
+  /* Ensure that children of left-box and right-box are properly centered */
+  .left-box > *,
+  .right-box > * {
+    width: auto;
+  }
+
+  .description {
+    font-size: large;
+    width: 400px;
+    font-weight: 500;
+  }
+
+  .description p {
+    padding: 15px;
   }
 }

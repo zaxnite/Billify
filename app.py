@@ -17,7 +17,8 @@ TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
 
 # # Hard-coded redirect URI
-REDIRECT_URI = 'https://listify-7e3513f08cf5.herokuapp.com/redirectPage'
+# REDIRECT_URI = 'https://listify-7e3513f08cf5.herokuapp.com/redirectPage'
+REDIRECT_URI = 'http://127.0.0.1:5000/redirectPage'
 
 
 def clear_cache():
@@ -222,11 +223,11 @@ def redirectPage():
     except Exception as e:
         print(f"Error obtaining token: {e}")  # Debug print
         return f"Error obtaining token: {e}"
-    return redirect(url_for('listify'))
+    return redirect(url_for('billify'))
 
 
-@app.route('/listify', methods=['GET', 'POST'])
-def listify():
+@app.route('/billify', methods=['GET', 'POST'])
+def billify():
     token_info = get_token()
     if not token_info:
         return redirect(url_for('login'))
@@ -310,7 +311,7 @@ def listify():
     random_card_number = generate_random_card_number()
     random_auth_code = generate_random_auth_code()
 
-    return render_template('listify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
+    return render_template('billify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
                            duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
                            auth_code=random_auth_code, get_spotify_link=get_spotify_link, metric=metric, limit=limit)
 

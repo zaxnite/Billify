@@ -4,11 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-    <title>Listify Receipt</title>
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <title>Billify's Bills</title>
+    <link rel="icon" href="{{ url_for('static', filename='icon.ico') }}" />
     <script src="{{ url_for('static', filename='html2canvas_min.js') }}"></script>
+    <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+    />
 </head>
-<body>
+<body class="scroll">
+    <header>
+        <div class="navbar">
+          <div class="logo"><a href="{{ url_for('home') }}">Billify</a></div>
+          <ul class="links">
+            <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('privacy') }}">Privacy Policy</a></li>
+            <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
+          </ul>
+          <div>
+            <input type="checkbox" class="checkbox" id="checkbox" />
+            <label for="checkbox" class="label">
+              <div class="ball"></div>
+            </label>
+          </div>
+          <div class="toggle_btn">
+            <i class="fa-solid fa-bars"></i>
+          </div>
+          <div class="dropdown_menu">
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('privacy') }}">Privacy Policy</a></li>
+            <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
+          </div>
+        </div>
+    </header>
     <div class="flex-container">
         <div class="left-box">
             <div class="receipt">
@@ -23,13 +56,13 @@
             {% elif user_name == 'leomarra2002' %}
                 <h1>Ciao Nardo,Sei pronto a farti esplodere la mente?</h1>
             {% elif user_name == 'hritish' %}
-                <h1>Hai Lund, Listify vich tuhanu swaagat hai</h1>
+                <h1>Hai Lund, billify vich tuhanu swaagat hai</h1>
             {% else %}
                 <h1>Welcome, {{ user_name }}!</h1>
             {% endif %}
-            <h2>Here's your Custom Listify Receipt</h2>
+            <h2>Here's your Custom Bill</h2>
             <h3>Metrics</h3>
-            <form id="metricForm" action="/listify" method="post">
+            <form id="metricForm" action="/billify" method="post">
                 <select class="select-dropdown" name="metric" onchange="this.form.submit()">
                     <option value="tracks" {% if metric == 'tracks' %}selected{% endif %}>Top Tracks</option>
                     <option value="artists" {% if metric == 'artists' %}selected{% endif %}>Top Artists</option>
@@ -39,7 +72,7 @@
             </form>
             <h3>Time Period</h3>
             <div class="time-button-container">
-                <form id="durationForm" action="/listify" method="post">
+                <form id="durationForm" action="/billify" method="post">
                     <input type="hidden" name="metric" value="{{ metric }}">
                     <input type="hidden" name="limit" value="{{ limit }}">
                     <button type="submit" name="duration" value="short_term" class="time-button {% if duration == 'short_term' %}active{% endif %}">Last Month</button>
@@ -49,7 +82,7 @@
             </div>
             <h3>Top Items</h3>
             <div class="length-button-container">
-                <form id="lengthForm" action="/listify" method="post">
+                <form id="lengthForm" action="/billify" method="post">
                     <input type="hidden" name="metric" value="{{ metric }}">
                     <input type="hidden" name="duration" value="{{ duration }}">
                     <button type="submit" name="limit" value="10" class="length-button {% if limit == 10 %}active{% endif %}">Top 10</button>
@@ -60,21 +93,21 @@
             <h3>Description</h3>
             <div class="description">
               {% if metric == 'tracks' %}
-                  <p>Your top tracks show the songs you've listened to the most over the selected period.</p>
-                  <p><span class="bold">QTY</span> - The ranking of a track in your most played. The higher up on the list, the more you have listened to it.</p>
-                  <p><span class="bold">AMT</span> - The length of the song.</p>
+                <p>Your top tracks show the songs you've listened to the most over the selected period.</p>
+                <p><span class="bold">QTY</span> - The ranking of a track in your most played. The higher up on the list, the more you have listened to it.</p>
+                <p><span class="bold">AMT</span> - The length of the song.</p>
               {% elif metric == 'artists' %}
-                  <p>Your top artists represent the musicians you've enjoyed the most.</p>
-                  <p><span class="bold">QTY</span> - The ranking of an artist in your most played. The higher up on the list, the more played it is.</p>
-                  <p><span class="bold">AMT</span> - The popularity of an artist, from 0-100. Where 100 is the most popular, while 0 is the least popular.</p>
+                <p>Your top artists represent the musicians you've enjoyed the most.</p>
+                <p><span class="bold">QTY</span> - The ranking of an artist in your most played. The higher up on the list, the more played it is.</p>
+                <p><span class="bold">AMT</span> - The popularity of an artist, from 0-100. Where 100 is the most popular, while 0 is the least popular.</p>
               {% elif metric == 'genres' %}
-                  <p>Your top genres highlight the styles of music you listen to most frequently.</p>
-                  <p><span class="bold">QTY</span> - The ranking of a genre in your most played artists.</p>
-                  <p><span class="bold">AMT</span> - The % of your top artists that a genre appears in. For example, 25% means that 25% of your top artists fall under the genre.</p>
+                <p>Your top genres highlight the styles of music you listen to most frequently.</p>
+                <p><span class="bold">QTY</span> - The ranking of a genre in your most played artists.</p>
+                <p><span class="bold">AMT</span> - The % of your top artists that a genre appears in. For example, 25% means that 25% of your top artists fall under the genre.</p>
               {% elif metric == 'podcasts' %}
-                  <p>Your top podcasts show the episodes you've listened to the most.</p>
-                  <p><span class="bold">QTY</span> - The ranking of a genre in your most played artists.</p>
-                  <p><span class="bold">AMT</span> - The % of your top artists that a genre appears in. For example, 25% means that 25% of your top artists fall under the genre.</p>
+                <p>Your top podcasts show the episodes you've listened to the most.</p>
+                <p><span class="bold">QTY</span> - The ranking of a genre in your most played artists.</p>
+                <p><span class="bold">AMT</span> - The % of your top artists that a genre appears in. For example, 25% means that 25% of your top artists fall under the genre.</p>
               {% elif metric == 'stats' %}
                 <p>Your stats give a detailed breakdown of your listening habits.</p>
                 <p><span class="bold">Popularity Score</span> - The average popularity score of your top 50 artists, from 0-100. The lower the number, the more "obscure" your music taste is.</p>
@@ -90,6 +123,35 @@
         </div>
     </div>
     <div class="space"></div>
+    <footer>
+        <div class="waves">
+          <div class="wave" id="wave1"></div>
+          <div class="wave" id="wave2"></div>
+          <div class="wave" id="wave3"></div>
+          <div class="wave" id="wave4"></div>
+        </div>
+        <ul class="social_icon">
+          <li>
+            <a href="mailto:ak7221@rit.edu"><i class="fa-solid fa-envelope"></i></a>
+          </li>
+          <li>
+            <a href="https://www.linkedin.com/in/aathif-khan-042214201/"><i class="fa-brands fa-linkedin"></i></a>
+          </li>
+          <li>
+            <a href="https://github.com/zaxnite"><i class="fa-brands fa-github"></i></a>
+          </li>
+          <li>
+            <a href="https://www.instagram.com/aathif.mp3/"><i class="fa-brands fa-instagram"></i></a>
+          </li>
+        </ul>
+        <ul class="menu">
+          <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+          <li><a href="{{ url_for('about') }}">About</a></li>
+          <li><a href="{{ url_for('privacy') }}">Privacy Policy</a></li>
+          <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
+        </ul>
+        <p>Made by Aathif Khan</p>
+      </footer>
 
     <script>
         document.querySelectorAll(".time-button, .length-button").forEach((button) => {
@@ -116,6 +178,7 @@
                 console.error('Error:', error);
             });
         });
+
     </script>
 </body>
 </html>
