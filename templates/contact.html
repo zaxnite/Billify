@@ -26,11 +26,11 @@
             <li><a href="{{ url_for('home') }}">Home</a></li>
             <li><a href="{{ url_for('about') }}">About</a></li>
             <li>
-              <a href="{{ url_for('privacy') }}" class="active"
-                >Privacy Policy</a
-              >
+              <a href="{{ url_for('privacy') }}">Privacy Policy</a>
             </li>
-            <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
+            <li>
+              <a href="{{ url_for('contact') }}" class="active">Contact Me</a>
+            </li>
           </ul>
           <div>
             <input type="checkbox" class="checkbox" id="checkbox" />
@@ -52,30 +52,16 @@
         </div>
       </header>
       <div class="center">
-        <h1>Privacy Policy</h1>
+        <h1>Have any questions?</h1>
         <h2>
-          Billify is an open-source application powered by Spotify. By using
-          this app, you consent to the use of your Spotify account information,
-          including your username and data for top artists and tracks.<br />
-          <br />
-          Billify does not store or collect any of your data, nor does it share
-          it with third parties. The data is solely used for generating your
-          music bill.<br />
-          <br />
-          While your data is handled securely and not used for any malicious
-          purposes, if you wish to revoke Billify's access, you can visit
-          <a
-            href="https://www.spotify.com/ae-en/account/apps/?_ga=2.57194153.2059435232.1677244602-1044990631.1616788427"
-            target="_blank"
-            >your apps page</a
-          >
-          and click "REMOVE ACCESS" next to Billify. For more detailed
-          instructions, click
-          <a
-            href="https://support.spotify.com/us/article/spotify-on-other-apps/"
-            target="_blank"
-            >here</a
-          >.
+          <h2>
+            For any other questions, feel free to
+            <a href="mailto:ak7221@g.rit.edu">email me</a> or send me a direct
+            message on
+            <a href="https://www.instagram.com/aathif.mp3/" target="_blank"
+              >Instagram</a
+            >!
+          </h2>
         </h2>
       </div>
 
@@ -112,9 +98,11 @@
           <li><a href="{{ url_for('home') }}">Home</a></li>
           <li><a href="{{ url_for('about') }}">About</a></li>
           <li>
-            <a href="{{ url_for('privacy') }}" class="active">Privacy Policy</a>
+            <a href="{{ url_for('privacy') }}">Privacy Policy</a>
           </li>
-          <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
+          <li>
+            <a href="{{ url_for('contact') }}" class="active">Contact Me</a>
+          </li>
         </ul>
         <p>Made by Aathif Khan</p>
       </footer>
