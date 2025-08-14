@@ -2,6 +2,150 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
 
+/* COLOR VARIABLES */
+:root {
+  /* Primary Colors */
+  --primary-green: #1db954;          /* Spotify green - Logo, buttons, links */
+  --primary-green-dark: #19b14e;     /* Darker green - Hover states, active buttons */
+  --primary-green-darker: #009432;   /* Even darker green - Button gradients */
+  --primary-green-darkest: #026b25;  /* Darkest green - Button gradients */
+  --primary-green-light: #38e558;    /* Light green - Button gradients */
+  --primary-green-accent: #3a9961;   /* Green accent - Footer background */
+  
+  /* Neutral Colors */
+  --white: #fff;                     /* White - Background, text, button backgrounds */
+  --black: #000;                     /* Black - Text, borders, hover states */
+  --gray-dark: #333;                 /* Dark gray - Body text, headings */
+  --gray-medium: #666;               /* Medium gray - Secondary text, subheadings */
+  --gray-light: #ccc;                /* Light gray - Borders, receipt container */
+  --gray-border: #555;               /* Gray for borders - Dashed borders in receipt */
+  --gray-text: rgb(110, 122, 136);   /* Gray for navigation text */
+  --background-light: #f9f9f9;       /* Light background - Receipt container */
+  
+  /* Blue Tones */
+  --blue-light: #77c2d0;             /* Light blue - Toggle gradient start */
+  --blue-medium: #3d91a7;            /* Medium blue - Toggle gradient end */
+  --blue-dark: #041326;              /* Dark blue - Dark toggle gradient start */
+  --blue-darker: #0e314c;            /* Darker blue - Dark toggle gradient end */
+  
+  /* Yellow Tones */
+  --yellow-bright: #fff500;          /* Bright yellow - Toggle ball */
+  --yellow-gold: #ffc700;            /* Gold yellow - Toggle ball gradient */
+  
+  /* Beige Tones */
+  --beige-light: #e5e0cf;            /* Light beige - Dark mode toggle ball */
+  --beige-medium: #ddd8ca;           /* Medium beige - Dark mode toggle ball */
+  --beige-accent: #efead7;           /* Accent beige - Dark mode toggle ball */
+  
+  /* Green Variations */
+  --green-dropdown: #b9e4c8;         /* Light green - Dropdown menu background */
+  --green-hover: #1ed760;            /* Bright green - Select option hover */
+  
+  /* Transparent */
+  --transparent: transparent;         /* Transparent - Various backgrounds */
+}
+
+/*
+COLOR USAGE KEY:
+
+--primary-green (#1db954):
+- Logo text and hover
+- Navigation links
+- Button backgrounds
+- Select dropdown focus border
+- Save image button background
+
+--primary-green-dark (#19b14e):
+- Navigation link underlines
+- Save image button hover
+- Action button backgrounds
+
+--primary-green-darker (#009432):
+- Spotify button gradient middle
+
+--primary-green-darkest (#026b25):
+- Spotify button gradient end
+
+--primary-green-light (#38e558):
+- Spotify button gradient start
+
+--primary-green-accent (#3a9961):
+- Footer background
+
+--white (#fff):
+- Body background
+- Button text
+- Footer text
+- Toggle ball backgrounds
+- Button backgrounds
+
+--black (#000):
+- Text color
+- Borders
+- Hover text colors
+- Receipt text
+
+--gray-dark (#333):
+- Body text color
+- Headings
+
+--gray-medium (#666):
+- Secondary text
+- Subheadings
+
+--gray-light (#ccc):
+- Receipt container border
+
+--gray-border (#555):
+- Receipt dashed borders
+
+--gray-text (rgb(110, 122, 136)):
+- Navigation link default color
+
+--background-light (#f9f9f9):
+- Receipt container background
+
+--blue-light (#77c2d0):
+- Toggle background gradient start
+
+--blue-medium (#3d91a7):
+- Toggle background gradient end
+
+--blue-dark (#041326):
+- Dark toggle background gradient start
+
+--blue-darker (#0e314c):
+- Dark toggle background gradient end
+
+--yellow-bright (#fff500):
+- Toggle ball background
+- Toggle ball glow
+
+--yellow-gold (#ffc700):
+- Toggle ball gradient
+- Toggle ball glow
+
+--beige-light (#e5e0cf):
+- Dark mode toggle ball
+- Dark mode toggle ball glow
+
+--beige-medium (#ddd8ca):
+- Dark mode toggle ball gradient
+- Dark mode toggle ball glow
+
+--beige-accent (#efead7):
+- Dark mode toggle ball gradient
+
+--green-dropdown (#b9e4c8):
+- Dropdown menu background
+
+--green-hover (#1ed760):
+- Select option hover background
+
+--transparent:
+- Various transparent backgrounds
+*/
+
 /* Reset default margin and padding */
 body,
 html {
@@ -16,8 +160,8 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.42857143;
-  color: #333;
-  background-color: #fff;
+  color: var(--gray-dark);
+  background-color: var(--white);
 }
 
 body.scroll {
@@ -40,7 +184,7 @@ body.scroll {
 /* Ensure footer sticks to the bottom */
 footer {
   display: flex;
-  background-color: #3a9961; /* Example background color */
+  background-color: var(--primary-green-accent);
   min-height: 100px;
   position: relative; /* Ensure relative positioning */
   width: 100%;
@@ -69,7 +213,7 @@ footer .menu li {
 
 footer .social_icon i {
   font-size: 2em;
-  color: white;
+  color: var(--white);
   margin: 0 10px;
   display: inline-block;
   transition: 0.5s;
@@ -82,7 +226,7 @@ footer .social_icon i:hover {
 footer .menu li a {
   padding-top: 10px;
   font-size: 1.2em;
-  color: white;
+  color: var(--white);
   margin: 0 10px;
   display: inline-block;
   transition: 0.5s;
@@ -96,7 +240,7 @@ footer .menu li a:hover {
 }
 
 footer p {
-  color: white;
+  color: var(--white);
   text-align: center;
   margin-top: 7.5px;
   margin-bottom: 5px;
@@ -179,7 +323,7 @@ header {
 }
 
 .navbar .toggle_btn {
-  color: black;
+  color: var(--black);
   font-size: 1.5rem;
   cursor: pointer;
   display: none;
@@ -191,7 +335,7 @@ header {
 
 .navbar a {
   text-decoration: none;
-  color: #1db954;
+  color: var(--primary-green);
   font-weight: bold;
   letter-spacing: 2px;
   position: relative;
@@ -227,27 +371,27 @@ header {
   padding: 5px 15px;
   font-weight: bold;
   letter-spacing: 2.2px;
-  color: rgb(110, 122, 136);
+  color: var(--gray-text);
   border-radius: 10px;
   position: relative;
   display: inline-block;
-  background: transparent;
+  background: var(--transparent);
   transition: color 0.4s;
 }
 
 .navbar .links li a:hover {
-  color: #000; /* Full black on hover */
+  color: var(--black); /* Full black on hover */
 }
 
 .navbar .links .active {
-  color: #000; /* Full black on hover */
+  color: var(--black); /* Full black on hover */
 }
 
 .navbar .links li::before {
   content: "";
   position: absolute;
   inset: calc(100% - 3px) 0 0 0;
-  background: #19b14e; /* Green color */
+  background: var(--primary-green-dark); /* Green color */
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s ease;
@@ -261,7 +405,7 @@ header {
   font-size: 2rem; /* Base font size */
   font-weight: bolder;
   text-decoration: none;
-  color: #1db954;
+  color: var(--primary-green);
   letter-spacing: 2px;
   position: relative;
   display: inline-block;
@@ -275,10 +419,10 @@ header {
 
 @keyframes slightGlow {
   0% {
-    text-shadow: 0 0 1px #1db934, 0 0 2px #1db934, 0 0 3px #1db934;
+    text-shadow: 0 0 1px var(--primary-green), 0 0 2px var(--primary-green), 0 0 3px var(--primary-green);
   }
   100% {
-    text-shadow: 0 0 1.5px #1db934, 0 0 2.5px #1db934, 0 0 3.5px #1db934;
+    text-shadow: 0 0 1.5px var(--primary-green), 0 0 2.5px var(--primary-green), 0 0 3.5px var(--primary-green);
   }
 }
 
@@ -290,7 +434,7 @@ header {
 .label {
   height: 20px; /* Increased height slightly */
   width: 50px; /* Increased width slightly */
-  background-image: linear-gradient(to right, #77c2d0, #3d91a7);
+  background-image: linear-gradient(to right, var(--blue-light), var(--blue-medium));
   display: flex;
   align-items: center;
   padding: 6px; /* Increased padding slightly */
@@ -304,24 +448,24 @@ header {
   height: 24px; /* Increased height slightly */
   width: 24px; /* Increased width slightly */
   border-radius: 50%;
-  background-image: linear-gradient(to right, #fff500, #ffc700);
+  background-image: linear-gradient(to right, var(--yellow-bright), var(--yellow-gold));
   position: absolute;
   top: 4px; /* Adjusted to match new size */
   left: 3px; /* Adjusted to match new size */
   transition: transform 0.5s linear, background-image 0.5s ease-in-out;
-  border: #000;
-  box-shadow: 0 0 2px #fff500, 0 0 5px #ffc700;
+  border: var(--black);
+  box-shadow: 0 0 2px var(--yellow-bright), 0 0 5px var(--yellow-gold);
   cursor: pointer;
 }
 
 .checkbox:checked + .label {
-  background-image: linear-gradient(to right, #041326, #0e314c);
+  background-image: linear-gradient(to right, var(--blue-dark), var(--blue-darker));
 }
 
 .checkbox:checked + .label .ball {
   transform: translateX(30px); /* Adjusted to match new size */
-  background-image: linear-gradient(to bottom right, #e5e0cf, #ddd8ca, #efead7);
-  box-shadow: 0 0 2px #e5e0cf, 0 0 5px #ddd8ca;
+  background-image: linear-gradient(to bottom right, var(--beige-light), var(--beige-medium), var(--beige-accent));
+  box-shadow: 0 0 2px var(--beige-light), 0 0 5px var(--beige-medium);
 }
 
 .dropdown_menu {
@@ -331,7 +475,7 @@ header {
   top: 60px;
   height: 0px;
   width: 300px;
-  background: #b9e4c8;
+  background: var(--green-dropdown);
   backdrop-filter: blur(15px);
   border-radius: 10px;
   overflow: hidden;
@@ -352,7 +496,7 @@ header {
   display: flex;
   justify-content: center; /* Center text horizontally */
   align-items: center; /* Center text vertically */
-  background-color: #19b14e;
+  background-color: var(--primary-green-dark);
   text-align: center; /* Ensure text is centered */
 }
 
@@ -375,13 +519,13 @@ header {
 }
 
 .center h1 {
-  color: #333; /* Adjust color as needed */
+  color: var(--gray-dark); /* Adjust color as needed */
   margin: 0px;
   font-weight: bolder;
 }
 
 .center h2 {
-  color: #666; /* Adjust color as needed */
+  color: var(--gray-medium); /* Adjust color as needed */
   margin-bottom: 20px; /* Optional: Add more space below h2 */
   font-weight: bold;
   margin-top: 10px;
@@ -390,7 +534,7 @@ header {
 }
 
 .center h2 .index {
-  color: #666; /* Adjust color as needed */
+  color: var(--gray-medium); /* Adjust color as needed */
   margin-bottom: 20px; /* Optional: Add more space below h2 */
   font-weight: bold;
   margin-top: 10px;
@@ -401,12 +545,12 @@ header {
   margin-top: 20px;
   padding: 15px 40px;
   text-decoration: none;
-  color: white;
+  color: var(--white);
   font-family: "montsrrat", sans-serif;
   border-radius: 6px;
   font-size: medium;
   background-size: 200%;
-  background-image: linear-gradient(to left, #38e558, #009432, #026b25);
+  background-image: linear-gradient(to left, var(--primary-green-light), var(--primary-green-darker), var(--primary-green-darkest));
   transition: 0.6s;
 }
 
@@ -437,8 +581,8 @@ header {
 #save-image-button {
   display: inline-block;
   padding: 10px 20px;
-  background-color: #1db954; /* Spotify green */
-  color: white;
+  background-color: var(--primary-green); /* Spotify green */
+  color: var(--white);
   text-decoration: none;
   border-radius: 10px;
   margin-top: 20px;
@@ -449,7 +593,7 @@ header {
 }
 
 #save-image-button:hover {
-  background-color: #19b14e;
+  background-color: var(--primary-green-dark);
 }
 
 .right-box {
@@ -485,9 +629,9 @@ header {
 .select-dropdown {
   width: 400px; /* Adjust width as needed */
   padding: 10px;
-  color: black;
-  border: 2px solid black;
-  background-color: white;
+  color: var(--black);
+  border: 2px solid var(--black);
+  background-color: var(--white);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 5px;
@@ -504,18 +648,18 @@ header {
 }
 
 .select-dropdown option:hover {
-  background-color: #1ed760; /* Green background on hover */
-  color: white;
+  background-color: var(--green-hover); /* Green background on hover */
+  color: var(--white);
 }
 
 .select-dropdown:focus {
   outline: none;
-  border-color: #1db954; /* Change border color on focus */
+  border-color: var(--primary-green); /* Change border color on focus */
 }
 
 .select-dropdown option:checked {
-  background-color: #1db954; /* Green background of selected option */
-  color: white;
+  background-color: var(--primary-green); /* Green background of selected option */
+  color: var(--white);
 }
 
 /* Button Styles */
@@ -530,9 +674,9 @@ header {
   flex: 1; /* Make buttons take equal space */
   text-align: center;
   padding: 15px 25px; /* Adjust padding to ensure buttons are evenly sized */
-  color: black;
-  border: 2px solid black;
-  background-color: white;
+  color: var(--black);
+  border: 2px solid var(--black);
+  background-color: var(--white);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -544,9 +688,9 @@ header {
   text-align: center;
   padding: 15px 20px; /* Adjust padding to ensure buttons are evenly sized */
   margin: 0 10px;
-  color: black;
-  border: 2px solid black;
-  background-color: white;
+  color: var(--black);
+  border: 2px solid var(--black);
+  background-color: var(--white);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -557,9 +701,9 @@ header {
   flex: 1; /* Make buttons take equal space */
   text-align: center;
   padding: 15px 30px; /* Adjust padding to ensure buttons are evenly sized */
-  color: black;
-  border: 2px solid black;
-  background-color: white;
+  color: var(--black);
+  border: 2px solid var(--black);
+  background-color: var(--white);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -572,9 +716,9 @@ header {
   margin-left: 15px;
   margin-right: 15px;
   padding: 15px 30px; /* Adjust padding to ensure buttons are evenly sized */
-  color: black;
-  border: 2px solid black;
-  background-color: white;
+  color: var(--black);
+  border: 2px solid var(--black);
+  background-color: var(--white);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -585,32 +729,32 @@ header {
 .time-button:active,
 .length-button:hover,
 .length-button:active {
-  color: white;
+  color: var(--white);
   background-color: green;
-  border: 1px solid black;
+  border: 1px solid var(--black);
 }
 
 .time-button.active,
 .length-button.active {
-  color: white;
+  color: var(--white);
   background-color: green;
-  border: 1px solid black;
+  border: 1px solid var(--black);
 }
 
 .time-button:hover,
 .time-button:active,
 .length-button:hover,
 .length-button:active {
-  color: white;
+  color: var(--white);
   background-color: green;
-  border: 1px solid black;
+  border: 1px solid var(--black);
 }
 
 .time-button.active,
 .length-button.active {
-  color: white;
+  color: var(--white);
   background-color: green;
-  border: 1px solid black;
+  border: 1px solid var(--black);
 }
 
 .description {
@@ -637,10 +781,10 @@ header {
   filter: brightness(105%);
   padding: 20px;
   text-transform: uppercase;
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  border: 1px solid var(--gray-light);
+  background-color: var(--background-light);
   max-height: max-content; /* Set max height to ensure it doesn't reach the bottom */
-  color: black; /* Set text color to black */
+  color: var(--black); /* Set text color to black */
 }
 
 .logo {
@@ -648,7 +792,7 @@ header {
   font-weight: 1000; /* Increase font thickness */
   font-size: 2.3rem;
   text-align: center;
-  color: black;
+  color: var(--black);
   margin-bottom: 15px; /* Reduce space below logo */
 }
 
@@ -656,13 +800,13 @@ p,
 table,
 .date {
   font-family: "receipt", "Courier New", Courier, monospace;
-  color: black; /* Set text color to black */
+  color: var(--black); /* Set text color to black */
   margin: 0; /* Remove default margin */
   padding: 0; /* Remove default padding */
 }
 
 td {
-  color: black; /* Set text color to black */
+  color: var(--black); /* Set text color to black */
 }
 
 .tracks {
@@ -671,7 +815,7 @@ td {
 
 table {
   max-width: 100%;
-  background-color: transparent;
+  background-color: var(--transparent);
   border-collapse: collapse;
   border-spacing: 0;
 }
@@ -692,17 +836,17 @@ td.name {
 
 /* Add borders to specific rows */
 .header-row td {
-  border-top: 1px dashed #555; /* Add top dashed border with dark gray color */
-  border-bottom: 1px dashed #555; /* Add bottom dashed border with dark gray color */
+  border-top: 1px dashed var(--gray-border); /* Add top dashed border with dark gray color */
+  border-bottom: 1px dashed var(--gray-border); /* Add bottom dashed border with dark gray color */
 }
 
 .total-counts td {
-  border-top: 1px dashed #555;
+  border-top: 1px dashed var(--gray-border);
   text-align: left;
 }
 
 .total-counts-end td {
-  border-bottom: 1px dashed #555;
+  border-bottom: 1px dashed var(--gray-border);
   text-align: left;
 }
 
