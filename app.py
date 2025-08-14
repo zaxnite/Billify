@@ -17,7 +17,7 @@ TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
 
 # # Hard-coded redirect URI
-REDIRECT_URI = 'https://billify-388bd942b87f.herokuapp.com/redirectPage'
+REDIRECT_URI = 'http://127.0.0.1:5000/redirectPage'
 
 
 def clear_cache():
