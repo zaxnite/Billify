@@ -21,7 +21,7 @@ card_number, auth_code, get_spotify_link, metric) -%}
         <td class="name">
           <a
             href="{% if metric == 'tracks' %}
-                    {{ get_spotify_link(item.id, item.artists[0].name) }}
+                    {{ item.external_urls.spotify if item.external_urls and item.external_urls.spotify else 'https://open.spotify.com/' }}
                   {% elif metric == 'genres' %}
                     https://open.spotify.com/
                   {% elif metric == 'stats' %}

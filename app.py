@@ -7,6 +7,8 @@ import random
 from collections import Counter
 from credentials import CLIENT_ID, CLIENT_SECRET, SECRET_KEY
 import os
+import re
+
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -87,17 +89,27 @@ def get_token():
     return token_info
 
 
-def get_spotify_track_link(track_name, artist_name):
+def get_spotify_track_link(track_name, artist_name, track_object=None):
+    """
+    Get Spotify track link. If track_object is provided (from top tracks API),
+    use the direct link. Otherwise, search for it.
+    """
+    # If we have the track object from the API, use the direct link
+    if track_object and 'external_urls' in track_object and 'spotify' in track_object['external_urls']:
+        return track_object['external_urls']['spotify']
+    
+    # Fallback to search (for cases where you don't have the track object)
     token_info = get_token()
     if not token_info:
         return None
 
     sp = spotipy.Spotify(auth=token_info['access_token'])
-    query = f"{track_name} {artist_name}"
+    query = f'track:"{track_name}" artist:"{artist_name}"'
+    
     results = sp.search(q=query, type='track', limit=1)
     if results and results['tracks']['items']:
-        track_id = results['tracks']['items'][0]['id']
-        return f"https://open.spotify.com/track/{track_id}"
+        return results['tracks']['items'][0]['external_urls']['spotify']
+    
     return None
 
 
@@ -311,8 +323,8 @@ def billify():
     random_auth_code = generate_random_auth_code()
 
     return render_template('billify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
-                           duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
-                           auth_code=random_auth_code, get_spotify_link=get_spotify_link, metric=metric, limit=limit)
+                       duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
+                       auth_code=random_auth_code, metric=metric, limit=limit)
 
 
 if __name__ == '__main__':
