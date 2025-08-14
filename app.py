@@ -247,7 +247,6 @@ def billify():
     user_info = sp.current_user()
     user_name = user_info['display_name']
 
-    # Get the duration and limit from the form submission
     duration = get_duration_from_button()
     limit = get_limit_from_button()
     metric = request.form.get('metric', 'tracks')
@@ -259,30 +258,31 @@ def billify():
     }
 
     duration_text = duration_text_map.get(duration, 'Last Month')
+    get_spotify_link = None  # Initialize the variable
 
     if metric == 'tracks':
         id = "top_tracks"
         top_data = sp.current_user_top_tracks(limit=limit, time_range=duration)
         top_items = top_data['items']
-        get_spotify_link = get_spotify_track_link  # Assign the function reference
+        get_spotify_link = get_spotify_track_link
     elif metric == 'genres':
         id = "top_genres"
         top_artists_data = sp.current_user_top_artists(
-            limit=50, time_range=duration)  # Fetch top 50 artists
+            limit=50, time_range=duration)
         top_artists = top_artists_data['items']
 
         genre_counter = Counter()
         for artist in top_artists:
             genre_counter.update(artist['genres'])
 
-        # Limit the genres based on the number of top artists
         limited_genres = genre_counter.most_common(limit)
         total_artists = len(top_artists)
         top_items = [{'name': genre, 'count': count, 'percentage': (count / total_artists) * 100}
                      for genre, count in limited_genres]
 
-        # No direct link for genres
-        def get_spotify_link(name, _): return 'https://open.spotify.com/'
+        def get_spotify_link_for_genres(name, _):
+            return 'https://open.spotify.com/'
+        get_spotify_link = get_spotify_link_for_genres
 
     elif metric == 'stats':
         id = "top_stats"
@@ -290,7 +290,6 @@ def billify():
         top = top_data['items']
         insights = calculate_insights(sp, top)
 
-        # Prepare insights for rendering
         top_items = [
             {'name': 'Popularity Score',
                 'value': f"{insights['popularity_score']:.2f}/100"},
@@ -307,15 +306,16 @@ def billify():
                 'value': f"{insights['instrumentalness']:.2f}"}
         ]
 
-        # No direct link for stats
-        def get_spotify_link(name, _): return 'https://open.spotify.com/'
+        def get_spotify_link_for_stats(name, _):
+            return 'https://open.spotify.com/'
+        get_spotify_link = get_spotify_link_for_stats
 
     else:
         id = "top_artists"
         top_data = sp.current_user_top_artists(
             limit=limit, time_range=duration)
         top_items = top_data['items']
-        get_spotify_link = get_spotify_artist_link  # Assign the function reference
+        get_spotify_link = get_spotify_artist_link
 
     current_time = datetime.now().strftime('%A, %B %d, %Y')
 
@@ -323,9 +323,8 @@ def billify():
     random_auth_code = generate_random_auth_code()
 
     return render_template('billify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
-                       duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
-                       auth_code=random_auth_code, metric=metric, limit=limit)
-
+                           duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
+                           auth_code=random_auth_code, metric=metric, limit=limit, get_spotify_link=get_spotify_link)
 
 if __name__ == '__main__':
     app.run(debug=True)

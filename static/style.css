@@ -4,7 +4,7 @@
 
 /* COLOR VARIABLES */
 :root {
-  /* Primary Colors */
+  /* Light Mode Colors */
   --primary-green: #1db954;          /* Spotify green - Logo, buttons, links */
   --primary-green-dark: #19b14e;     /* Darker green - Hover states, active buttons */
   --primary-green-darker: #009432;   /* Even darker green - Button gradients */
@@ -12,37 +12,53 @@
   --primary-green-light: #38e558;    /* Light green - Button gradients */
   --primary-green-accent: #3a9961;   /* Green accent - Footer background */
   
-  /* Neutral Colors */
-  --white: #fff;                     /* White - Background, text, button backgrounds */
-  --black: #000;                     /* Black - Text, borders, hover states */
-  --gray-dark: #333;                 /* Dark gray - Body text, headings */
-  --gray-medium: #666;               /* Medium gray - Secondary text, subheadings */
-  --gray-light: #ccc;                /* Light gray - Borders, receipt container */
-  --gray-border: #555;               /* Gray for borders - Dashed borders in receipt */
-  --gray-text: rgb(110, 122, 136);   /* Gray for navigation text */
-  --background-light: #f9f9f9;       /* Light background - Receipt container */
+  /* Light Mode Neutral Colors */
+  --bg-primary: #fff;                /* Main background */
+  --bg-secondary: #f9f9f9;           /* Secondary background (receipt) */
+  --text-primary: #333;              /* Primary text color */
+  --text-secondary: #666;            /* Secondary text color */
+  --text-tertiary: rgb(110, 122, 136); /* Tertiary text (nav links) */
+  --border-primary: #000;            /* Primary borders */
+  --border-secondary: #ccc;          /* Secondary borders */
+  --border-dashed: #555;             /* Dashed borders */
+  --button-bg: #fff;                 /* Button backgrounds */
+  --button-text: #000;               /* Button text */
+  --button-border: #000;             /* Button borders */
   
-  /* Blue Tones */
+  /* Toggle Colors */
   --blue-light: #77c2d0;             /* Light blue - Toggle gradient start */
   --blue-medium: #3d91a7;            /* Medium blue - Toggle gradient end */
   --blue-dark: #041326;              /* Dark blue - Dark toggle gradient start */
   --blue-darker: #0e314c;            /* Darker blue - Dark toggle gradient end */
-  
-  /* Yellow Tones */
   --yellow-bright: #fff500;          /* Bright yellow - Toggle ball */
   --yellow-gold: #ffc700;            /* Gold yellow - Toggle ball gradient */
-  
-  /* Beige Tones */
   --beige-light: #e5e0cf;            /* Light beige - Dark mode toggle ball */
   --beige-medium: #ddd8ca;           /* Medium beige - Dark mode toggle ball */
   --beige-accent: #efead7;           /* Accent beige - Dark mode toggle ball */
   
-  /* Green Variations */
+  /* Other Colors */
   --green-dropdown: #b9e4c8;         /* Light green - Dropdown menu background */
   --green-hover: #1ed760;            /* Bright green - Select option hover */
-  
-  /* Transparent */
   --transparent: transparent;         /* Transparent - Various backgrounds */
+}
+
+
+
+/* Dark Mode Colors */
+.dark-mode {
+  --bg-primary: #121212;             /* Dark main background */
+  --bg-secondary: #1e1e1e;           /* Dark secondary background (receipt) */
+  --text-primary: #e0e0e0;           /* Dark mode primary text */
+  --text-secondary: #b3b3b3;         /* Dark mode secondary text */
+  --text-tertiary: #8a8a8a;          /* Dark mode tertiary text */
+  --border-primary: #404040;         /* Dark mode primary borders */
+  --border-secondary: #333;          /* Dark mode secondary borders */
+  --border-dashed: #666;             /* Dark mode dashed borders */
+  --button-bg: #2a2a2a;              /* Dark mode button backgrounds */
+  --button-text: #e0e0e0;            /* Dark mode button text */
+  --button-border: #404040;          /* Dark mode button borders */
+  --green-dropdown: #2d4a32;         /* Dark green dropdown background */
+  --green-hover: #1db954;            /* Keep green hover bright for contrast */
 }
 
 /*
@@ -160,8 +176,9 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.42857143;
-  color: var(--gray-dark);
-  background-color: var(--white);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body.scroll {
@@ -213,7 +230,7 @@ footer .menu li {
 
 footer .social_icon i {
   font-size: 2em;
-  color: var(--white);
+  color: var(--bg-primary);
   margin: 0 10px;
   display: inline-block;
   transition: 0.5s;
@@ -226,7 +243,7 @@ footer .social_icon i:hover {
 footer .menu li a {
   padding-top: 10px;
   font-size: 1.2em;
-  color: var(--white);
+  color: var(--bg-primary);
   margin: 0 10px;
   display: inline-block;
   transition: 0.5s;
@@ -240,7 +257,7 @@ footer .menu li a:hover {
 }
 
 footer p {
-  color: var(--white);
+  color: var(--bg-primary);
   text-align: center;
   margin-top: 7.5px;
   margin-bottom: 5px;
@@ -323,7 +340,7 @@ header {
 }
 
 .navbar .toggle_btn {
-  color: var(--black);
+  color: var(--text-primary);
   font-size: 1.5rem;
   cursor: pointer;
   display: none;
@@ -371,7 +388,7 @@ header {
   padding: 5px 15px;
   font-weight: bold;
   letter-spacing: 2.2px;
-  color: var(--gray-text);
+  color: var(--text-tertiary);
   border-radius: 10px;
   position: relative;
   display: inline-block;
@@ -380,11 +397,11 @@ header {
 }
 
 .navbar .links li a:hover {
-  color: var(--black); /* Full black on hover */
+  color: var(--text-primary); /* Full black on hover */
 }
 
 .navbar .links .active {
-  color: var(--black); /* Full black on hover */
+  color: var(--text-primary); /* Full black on hover */
 }
 
 .navbar .links li::before {
@@ -519,13 +536,13 @@ header {
 }
 
 .center h1 {
-  color: var(--gray-dark); /* Adjust color as needed */
+  color: var(--text-primary); /* Adjust color as needed */
   margin: 0px;
   font-weight: bolder;
 }
 
 .center h2 {
-  color: var(--gray-medium); /* Adjust color as needed */
+  color: var(--text-secondary); /* Adjust color as needed */
   margin-bottom: 20px; /* Optional: Add more space below h2 */
   font-weight: bold;
   margin-top: 10px;
@@ -534,7 +551,7 @@ header {
 }
 
 .center h2 .index {
-  color: var(--gray-medium); /* Adjust color as needed */
+  color: var(--text-secondary); /* Adjust color as needed */
   margin-bottom: 20px; /* Optional: Add more space below h2 */
   font-weight: bold;
   margin-top: 10px;
@@ -545,7 +562,7 @@ header {
   margin-top: 20px;
   padding: 15px 40px;
   text-decoration: none;
-  color: var(--white);
+  color: white;
   font-family: "montsrrat", sans-serif;
   border-radius: 6px;
   font-size: medium;
@@ -582,7 +599,7 @@ header {
   display: inline-block;
   padding: 10px 20px;
   background-color: var(--primary-green); /* Spotify green */
-  color: var(--white);
+  color: white;
   text-decoration: none;
   border-radius: 10px;
   margin-top: 20px;
@@ -629,9 +646,9 @@ header {
 .select-dropdown {
   width: 400px; /* Adjust width as needed */
   padding: 10px;
-  color: var(--black);
-  border: 2px solid var(--black);
-  background-color: var(--white);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
+  background-color: var(--button-bg);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 5px;
@@ -649,7 +666,7 @@ header {
 
 .select-dropdown option:hover {
   background-color: var(--green-hover); /* Green background on hover */
-  color: var(--white);
+  color: white;
 }
 
 .select-dropdown:focus {
@@ -659,7 +676,7 @@ header {
 
 .select-dropdown option:checked {
   background-color: var(--primary-green); /* Green background of selected option */
-  color: var(--white);
+  color: white;
 }
 
 /* Button Styles */
@@ -674,9 +691,9 @@ header {
   flex: 1; /* Make buttons take equal space */
   text-align: center;
   padding: 15px 25px; /* Adjust padding to ensure buttons are evenly sized */
-  color: var(--black);
-  border: 2px solid var(--black);
-  background-color: var(--white);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
+  background-color: var(--button-bg);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -688,9 +705,9 @@ header {
   text-align: center;
   padding: 15px 20px; /* Adjust padding to ensure buttons are evenly sized */
   margin: 0 10px;
-  color: var(--black);
-  border: 2px solid var(--black);
-  background-color: var(--white);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
+  background-color: var(--button-bg);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -701,9 +718,9 @@ header {
   flex: 1; /* Make buttons take equal space */
   text-align: center;
   padding: 15px 30px; /* Adjust padding to ensure buttons are evenly sized */
-  color: var(--black);
-  border: 2px solid var(--black);
-  background-color: var(--white);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
+  background-color: var(--button-bg);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -716,9 +733,9 @@ header {
   margin-left: 15px;
   margin-right: 15px;
   padding: 15px 30px; /* Adjust padding to ensure buttons are evenly sized */
-  color: var(--black);
-  border: 2px solid var(--black);
-  background-color: var(--white);
+  color: var(--button-text);
+  border: 2px solid var(--button-border);
+  background-color: var(--button-bg);
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 50px; /* Adjust the value to control the roundness */
@@ -729,32 +746,16 @@ header {
 .time-button:active,
 .length-button:hover,
 .length-button:active {
-  color: var(--white);
+  color: white;
   background-color: green;
-  border: 1px solid var(--black);
+  border: 1px solid var(--button-border);
 }
 
 .time-button.active,
 .length-button.active {
-  color: var(--white);
+  color: white;
   background-color: green;
-  border: 1px solid var(--black);
-}
-
-.time-button:hover,
-.time-button:active,
-.length-button:hover,
-.length-button:active {
-  color: var(--white);
-  background-color: green;
-  border: 1px solid var(--black);
-}
-
-.time-button.active,
-.length-button.active {
-  color: var(--white);
-  background-color: green;
-  border: 1px solid var(--black);
+  border: 1px solid var(--button-border);
 }
 
 .description {
@@ -781,10 +782,10 @@ header {
   filter: brightness(105%);
   padding: 20px;
   text-transform: uppercase;
-  border: 1px solid var(--gray-light);
-  background-color: var(--background-light);
+  border: 1px solid var(--border-secondary);
+  background-color: var(--bg-secondary);
   max-height: max-content; /* Set max height to ensure it doesn't reach the bottom */
-  color: var(--black); /* Set text color to black */
+  color: var(--text-primary); /* Set text color to black */
 }
 
 .logo {
@@ -792,7 +793,7 @@ header {
   font-weight: 1000; /* Increase font thickness */
   font-size: 2.3rem;
   text-align: center;
-  color: var(--black);
+  color: var(--text-primary);
   margin-bottom: 15px; /* Reduce space below logo */
 }
 
@@ -800,13 +801,13 @@ p,
 table,
 .date {
   font-family: "receipt", "Courier New", Courier, monospace;
-  color: var(--black); /* Set text color to black */
+  color: var(--text-primary); /* Set text color to black */
   margin: 0; /* Remove default margin */
   padding: 0; /* Remove default padding */
 }
 
 td {
-  color: var(--black); /* Set text color to black */
+  color: var(--text-primary); /* Set text color to black */
 }
 
 .tracks {
@@ -836,17 +837,17 @@ td.name {
 
 /* Add borders to specific rows */
 .header-row td {
-  border-top: 1px dashed var(--gray-border); /* Add top dashed border with dark gray color */
-  border-bottom: 1px dashed var(--gray-border); /* Add bottom dashed border with dark gray color */
+  border-top: 1px dashed var(--border-dashed); /* Add top dashed border with dark gray color */
+  border-bottom: 1px dashed var(--border-dashed); /* Add bottom dashed border with dark gray color */
 }
 
 .total-counts td {
-  border-top: 1px dashed var(--gray-border);
+  border-top: 1px dashed var(--border-dashed);
   text-align: left;
 }
 
 .total-counts-end td {
-  border-bottom: 1px dashed var(--gray-border);
+  border-bottom: 1px dashed var(--border-dashed);
   text-align: left;
 }
 

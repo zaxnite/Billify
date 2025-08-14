@@ -179,6 +179,30 @@
             });
         });
 
+              document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('checkbox');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        
+        if (currentTheme === 'dark') {
+          body.classList.add('dark-mode');
+          checkbox.checked = true;
+        }
+        
+        // Listen for toggle changes
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+          } else {
+            body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+          }
+        });
+      });
+
     </script>
 </body>
 </html>

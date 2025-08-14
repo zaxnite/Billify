@@ -55,15 +55,12 @@
         <h1>Privacy Policy</h1>
         <h2>
           Billify is an open-source application powered by Spotify. By using
-          this app, you consent to the use of your Spotify account information,
-          including your username and data for top artists and tracks.<br />
-          <br />
+          this app, you consent to the use of your Spotify account information<br />
           Billify does not store or collect any of your data, nor does it share
           it with third parties. The data is solely used for generating your
           music bill.<br />
-          <br />
           While your data is handled securely and not used for any malicious
-          purposes, if you wish to revoke Billify's access, you can visit
+          purposes, if you wish to revoke Billify's access, you can visit<br />
           <a
             href="https://www.spotify.com/ae-en/account/apps/?_ga=2.57194153.2059435232.1677244602-1044990631.1616788427"
             target="_blank"
@@ -109,11 +106,9 @@
           </li>
         </ul>
         <ul class="menu">
-          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
           <li><a href="{{ url_for('about') }}">About</a></li>
-          <li>
-            <a href="{{ url_for('privacy') }}" class="active">Privacy Policy</a>
-          </li>
+          <li><a href="{{ url_for('privacy') }}">Privacy Policy</a></li>
           <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
         </ul>
         <p>Made by Aathif Khan</p>
@@ -132,6 +127,30 @@
           ? "fa-solid fa-xmark"
           : "fa-solid fa-bars";
       };
+
+            document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('checkbox');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        
+        if (currentTheme === 'dark') {
+          body.classList.add('dark-mode');
+          checkbox.checked = true;
+        }
+        
+        // Listen for toggle changes
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+          } else {
+            body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
+          }
+        });
+      });
     </script>
   </body>
 </html>
