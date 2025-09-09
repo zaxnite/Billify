@@ -40,6 +40,7 @@
   --green-dropdown: #b9e4c8;         /* Light green - Dropdown menu background */
   --green-hover: #1ed760;            /* Bright green - Select option hover */
   --transparent: transparent;         /* Transparent - Various backgrounds */
+  --footer-text: #ffffff;            /* White text for light mode footer */
 }
 
 
@@ -59,6 +60,7 @@
   --button-border: #404040;          /* Dark mode button borders */
   --green-dropdown: #2d4a32;         /* Dark green dropdown background */
   --green-hover: #1db954;            /* Keep green hover bright for contrast */
+  --footer-text: #e8f5e8;            /* Light green text for dark mode footer */
 }
 
 /*
@@ -230,7 +232,7 @@ footer .menu li {
 
 footer .social_icon i {
   font-size: 2em;
-  color: var(--bg-primary);
+  color: var(--footer-text);
   margin: 0 10px;
   display: inline-block;
   transition: 0.5s;
@@ -243,7 +245,7 @@ footer .social_icon i:hover {
 footer .menu li a {
   padding-top: 10px;
   font-size: 1.2em;
-  color: var(--bg-primary);
+  color: var(--footer-text);
   margin: 0 10px;
   display: inline-block;
   transition: 0.5s;
@@ -256,8 +258,14 @@ footer .menu li a:hover {
   transform: translateY(-8px);
 }
 
+footer .menu li a.active {
+  opacity: 1;
+  font-weight: bold;
+  color: var(--footer-text);
+}
+
 footer p {
-  color: var(--bg-primary);
+  color: var(--footer-text);
   text-align: center;
   margin-top: 7.5px;
   margin-bottom: 5px;
@@ -607,10 +615,18 @@ header {
   cursor: pointer;
   text-align: center;
   width: 345px;
+  border: none;
+  transition: background-color 0.3s ease;
 }
 
-#save-image-button:hover {
+#save-image-button:hover:not(:disabled) {
   background-color: var(--primary-green-dark);
+}
+
+#save-image-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .right-box {
@@ -779,6 +795,8 @@ header {
   background-size: cover;
   font-weight: 550;
   width: 300px;
+  max-width: 100%;
+  display: inline-block;
   filter: brightness(105%);
   padding: 20px;
   text-transform: uppercase;
@@ -786,6 +804,24 @@ header {
   background-color: var(--bg-secondary);
   max-height: max-content; /* Set max height to ensure it doesn't reach the bottom */
   color: var(--text-primary); /* Set text color to black */
+}
+
+/* Ensure receipt container is visible for html2canvas */
+.receipt {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure images are centered */
+#barcode-image, #spotify-logo {
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* Dark mode override for receipt background */
+.dark-mode .receiptContainer {
+  background-image: url(dark-wrinkled-paper.jpg);
 }
 
 .logo {

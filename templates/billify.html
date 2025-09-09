@@ -145,7 +145,7 @@
           </li>
         </ul>
         <ul class="menu">
-          <li><a href="{{ url_for('home') }}" class="active">Home</a></li>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
           <li><a href="{{ url_for('about') }}">About</a></li>
           <li><a href="{{ url_for('privacy') }}">Privacy Policy</a></li>
           <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
@@ -162,21 +162,179 @@
             });
         });
 
-        document.getElementById('save-image-button').addEventListener('click', function() {
-            html2canvas(document.querySelector(".receipt")).then(canvas => {
-                const img = document.createElement('img');
-                img.src = canvas.toDataURL("image/png");
-
-                const link = document.createElement('a');
-                link.href = img.src;
-                link.download = '{{ user_name }}_receipt.png';
-
-                document.body.appendChild(img);
-                link.click();
-                document.body.removeChild(img);
-            }).catch(error => {
-                console.error('Error:', error);
+        // Function to convert image to base64
+        function imageToBase64(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = this.width;
+                    canvas.height = this.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(this, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject;
+                img.src = url;
             });
+        }
+
+        document.getElementById('save-image-button').addEventListener('click', function() {
+            const button = this;
+            const originalText = button.textContent;
+            
+            // Show loading state
+            button.textContent = 'Generating...';
+            button.disabled = true;
+            
+            // Get the receipt element
+            const receiptElement = document.querySelector(".receipt");
+            
+            // Ensure element is visible and has content
+            if (!receiptElement || receiptElement.offsetHeight === 0) {
+                alert('Receipt not found or not visible');
+                button.textContent = originalText;
+                button.disabled = false;
+                return;
+            }
+            
+            // Check if we're in dark mode
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            
+            html2canvas(receiptElement, {
+                backgroundColor: null, // transparent so we can draw paper under it
+                scale: 1.5,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                removeContainer: true,
+                imageTimeout: 20000,
+                ignoreElements: function(element) {
+                    return element.classList && element.classList.contains('ignore-capture');
+                },
+                onclone: function(clonedDoc) {
+                    // Apply inline styles to ensure visibility
+                    const clonedReceipt = clonedDoc.querySelector('.receipt');
+                    if (clonedReceipt) {
+                        clonedReceipt.style.display = 'block';
+                        clonedReceipt.style.visibility = 'visible';
+                        clonedReceipt.style.opacity = '1';
+                        clonedReceipt.style.position = 'relative';
+                        clonedReceipt.style.zIndex = '1';
+                    }
+                    
+                    const clonedContainer = clonedDoc.querySelector('.receiptContainer');
+                    if (clonedContainer) {
+                        clonedContainer.style.display = 'inline-block';
+                        clonedContainer.style.visibility = 'visible';
+                        clonedContainer.style.opacity = '1';
+                        clonedContainer.style.position = 'relative';
+                        clonedContainer.style.border = '1px solid ' + (isDarkMode ? '#444' : '#ccc');
+                        clonedContainer.style.padding = '20px';
+                        clonedContainer.style.width = '300px';
+                        clonedContainer.style.fontWeight = '550';
+                        clonedContainer.style.textTransform = 'uppercase';
+                        // Remove background colors/images so transparency works
+                        clonedContainer.style.background = 'transparent';
+                    }
+                    
+                    // Ensure images are correct for theme
+                    const spotifyLogo = clonedDoc.querySelector('#spotify-logo');
+                    if (spotifyLogo) {
+                        spotifyLogo.src = isDarkMode
+                          ? "{{ url_for('static', filename='Spotify_Logo_RGB_White.png') }}"
+                          : "{{ url_for('static', filename='Spotify_Logo_RGB_Black.png') }}";
+                        spotifyLogo.style.display = 'block';
+                        spotifyLogo.style.margin = '0 auto';
+                        spotifyLogo.style.width = '60%';
+                        spotifyLogo.style.paddingTop = '20px';
+                    }
+                    const barcodeImage = clonedDoc.querySelector('#barcode-image');
+                    if (barcodeImage) {
+                        barcodeImage.src = isDarkMode
+                          ? "{{ url_for('static', filename='barcode_transparent.png') }}"
+                          : "{{ url_for('static', filename='barcode.png') }}";
+                        barcodeImage.style.display = 'block';
+                        barcodeImage.style.margin = '0 auto';
+                        barcodeImage.style.width = '80%';
+                    }
+                    // Force text colors for visibility
+                    clonedDoc.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div').forEach(el => {
+                        if (el.textContent && el.textContent.trim() !== '') {
+                            el.style.color = isDarkMode ? '#ffffff' : '#000000';
+                        }
+                    });
+                }
+            }).then(canvas => {
+                // Now add background image to the canvas
+                const backgroundImageUrl = isDarkMode ? 
+                    "{{ url_for('static', filename='dark-wrinkled-paper.jpg') }}" : 
+                    "{{ url_for('static', filename='wrinkled-paper.jpg') }}";
+                
+                const backgroundImg = new Image();
+                backgroundImg.onload = function() {
+                    // Create a new canvas with background
+                    const newCanvas = document.createElement('canvas');
+                    newCanvas.width = canvas.width;
+                    newCanvas.height = canvas.height;
+                    const ctx = newCanvas.getContext('2d');
+                    
+                    // Fill background color first
+                    ctx.fillStyle = isDarkMode ? '#2a2a2a' : '#f8f8f8';
+                    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+                    
+                    // Draw background pattern
+                    const pattern = ctx.createPattern(backgroundImg, 'repeat');
+                    ctx.fillStyle = pattern;
+                    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+                    
+                    // Draw the original canvas on top
+                    ctx.drawImage(canvas, 0, 0);
+                    
+                    // Download the final canvas
+                    downloadCanvas(newCanvas);
+                };
+                backgroundImg.onerror = function() {
+                    // If background image fails, just use the original canvas
+                    downloadCanvas(canvas);
+                };
+                backgroundImg.src = backgroundImageUrl;
+                
+            }).catch(error => {
+                console.error('Error generating image:', error);
+                alert('Failed to generate image: ' + error.message);
+                button.textContent = originalText;
+                button.disabled = false;
+            });
+            
+            function downloadCanvas(canvas) {
+                try {
+                    // Check if canvas has content
+                    if (canvas.width === 0 || canvas.height === 0) {
+                        throw new Error('Canvas is empty');
+                    }
+                    
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.download = '{{ user_name }}_receipt.png';
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    
+                    // Append to body, click, and remove
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Reset button
+                    button.textContent = originalText;
+                    button.disabled = false;
+                } catch (error) {
+                    console.error('Error creating download:', error);
+                    alert('Failed to save image: ' + error.message);
+                    button.textContent = originalText;
+                    button.disabled = false;
+                }
+            }
         });
 
               document.addEventListener('DOMContentLoaded', function() {

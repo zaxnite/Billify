@@ -64,12 +64,14 @@ card_number, auth_code, get_spotify_link, metric) -%}
   <div class="thanks">
     <p>THANK YOU FOR VISITING!</p>
     <img
-      style="width: 80%"
+      id="barcode-image"
+      style="width: 80%; display: block; margin: 0 auto;"
       src="{{ url_for('static', filename='barcode.png') }}"
     />
     <p class="website">billify.com by Aathif Khan</p>
     <img
-      style="width: 40%; padding-top: 20px"
+      id="spotify-logo"
+      style="width: 60%; padding-top: 20px; display: block; margin: 0 auto;"
       src="{{ url_for('static', filename='Spotify_Logo_RGB_Black.png') }}"
     />
   </div>
@@ -102,6 +104,54 @@ card_number, auth_code, get_spotify_link, metric) -%}
 
     // Display formatted order number
     document.querySelector(".order").textContent = `ORDER #${orderNumber}`;
+
+    // Function to update Spotify logo based on dark mode
+    function updateSpotifyLogo() {
+      const spotifyLogo = document.getElementById("spotify-logo");
+      const isDarkMode = document.body.classList.contains("dark-mode");
+      
+      if (isDarkMode) {
+        spotifyLogo.src = "{{ url_for('static', filename='Spotify_Logo_RGB_White.png') }}";
+      } else {
+        spotifyLogo.src = "{{ url_for('static', filename='Spotify_Logo_RGB_Black.png') }}";
+      }
+    }
+
+    // Function to update barcode image based on dark mode
+    function updateBarcodeImage() {
+      const barcodeImage = document.getElementById("barcode-image");
+      const isDarkMode = document.body.classList.contains("dark-mode");
+      
+      if (isDarkMode) {
+        barcodeImage.src = "{{ url_for('static', filename='barcode_transparent.png') }}";
+      } else {
+        barcodeImage.src = "{{ url_for('static', filename='barcode.png') }}";
+      }
+    }
+
+    // Function to update all images based on dark mode
+    function updateImagesForDarkMode() {
+      updateSpotifyLogo();
+      updateBarcodeImage();
+    }
+
+    // Update images on page load
+    updateImagesForDarkMode();
+
+    // Watch for dark mode changes
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          updateImagesForDarkMode();
+        }
+      });
+    });
+
+    // Start observing the body element for class changes
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
 
     let totalAmt = 0;
     document.querySelectorAll(".amt").forEach(function (amtElement) {

@@ -8,6 +8,7 @@ from collections import Counter
 from credentials import CLIENT_ID, CLIENT_SECRET, SECRET_KEY
 import os
 import re
+from functools import wraps
 
 
 app = Flask(__name__)
@@ -20,6 +21,37 @@ SCOPE = 'user-top-read'
 
 # # Hard-coded redirect URI
 REDIRECT_URI = 'http://127.0.0.1:5000/redirectPage'
+
+
+def retry_on_failure(max_retries=3, delay=1):
+    """Decorator to retry API calls with exponential backoff"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        print(f"Final attempt failed for {func.__name__}: {e}")
+                        raise e
+                    else:
+                        wait_time = delay * (2 ** attempt)
+                        print(f"Attempt {attempt + 1} failed for {func.__name__}: {e}. Retrying in {wait_time} seconds...")
+                        time.sleep(wait_time)
+            return None
+        return wrapper
+    return decorator
+
+
+def create_spotify_client(token):
+    """Create Spotify client with increased timeout"""
+    return spotipy.Spotify(
+        auth=token,
+        requests_timeout=10,  # 10 second timeout
+        retries=3,
+        status_retries=3
+    )
 
 
 def clear_cache():
@@ -103,12 +135,19 @@ def get_spotify_track_link(track_name, artist_name, track_object=None):
     if not token_info:
         return None
 
-    sp = spotipy.Spotify(auth=token_info['access_token'])
-    query = f'track:"{track_name}" artist:"{artist_name}"'
-    
-    results = sp.search(q=query, type='track', limit=1)
-    if results and results['tracks']['items']:
-        return results['tracks']['items'][0]['external_urls']['spotify']
+    try:
+        sp = create_spotify_client(token_info['access_token'])
+        query = f'track:"{track_name}" artist:"{artist_name}"'
+        
+        @retry_on_failure(max_retries=3, delay=1)
+        def search_track():
+            return sp.search(q=query, type='track', limit=1)
+        
+        results = search_track()
+        if results and results['tracks']['items']:
+            return results['tracks']['items'][0]['external_urls']['spotify']
+    except Exception as e:
+        print(f"Error searching for track {track_name} by {artist_name}: {e}")
     
     return None
 
@@ -127,6 +166,7 @@ def get_limit_from_button():
     return int(limit)
 
 
+@retry_on_failure(max_retries=3, delay=1)
 def get_audio_features(sp, track_ids):
     features = sp.audio_features(tracks=track_ids)
     return features
@@ -243,88 +283,117 @@ def billify():
     if not token_info:
         return redirect(url_for('login'))
 
-    sp = spotipy.Spotify(auth=token_info['access_token'])
-    user_info = sp.current_user()
-    user_name = user_info['display_name']
+    try:
+        sp = create_spotify_client(token_info['access_token'])
+        
+        @retry_on_failure(max_retries=3, delay=1)
+        def get_user_info():
+            return sp.current_user()
+        
+        user_info = get_user_info()
+        user_name = user_info['display_name']
 
-    duration = get_duration_from_button()
-    limit = get_limit_from_button()
-    metric = request.form.get('metric', 'tracks')
+        duration = get_duration_from_button()
+        limit = get_limit_from_button()
+        metric = request.form.get('metric', 'tracks')
 
-    duration_text_map = {
-        'short_term': 'Last Month',
-        'medium_term': 'Last 6 months',
-        'long_term': 'Last Year'
-    }
+        duration_text_map = {
+            'short_term': 'Last Month',
+            'medium_term': 'Last 6 months',
+            'long_term': 'Last Year'
+        }
 
-    duration_text = duration_text_map.get(duration, 'Last Month')
-    get_spotify_link = None  # Initialize the variable
+        duration_text = duration_text_map.get(duration, 'Last Month')
+        get_spotify_link = None  # Initialize the variable
 
-    if metric == 'tracks':
-        id = "top_tracks"
-        top_data = sp.current_user_top_tracks(limit=limit, time_range=duration)
-        top_items = top_data['items']
-        get_spotify_link = get_spotify_track_link
-    elif metric == 'genres':
-        id = "top_genres"
-        top_artists_data = sp.current_user_top_artists(
-            limit=50, time_range=duration)
-        top_artists = top_artists_data['items']
+        if metric == 'tracks':
+            id = "top_tracks"
+            
+            @retry_on_failure(max_retries=3, delay=1)
+            def get_top_tracks():
+                return sp.current_user_top_tracks(limit=limit, time_range=duration)
+            
+            top_data = get_top_tracks()
+            top_items = top_data['items']
+            get_spotify_link = get_spotify_track_link
+            
+        elif metric == 'genres':
+            id = "top_genres"
+            
+            @retry_on_failure(max_retries=3, delay=1)
+            def get_top_artists_for_genres():
+                return sp.current_user_top_artists(limit=50, time_range=duration)
+            
+            top_artists_data = get_top_artists_for_genres()
+            top_artists = top_artists_data['items']
 
-        genre_counter = Counter()
-        for artist in top_artists:
-            genre_counter.update(artist['genres'])
+            genre_counter = Counter()
+            for artist in top_artists:
+                genre_counter.update(artist['genres'])
 
-        limited_genres = genre_counter.most_common(limit)
-        total_artists = len(top_artists)
-        top_items = [{'name': genre, 'count': count, 'percentage': (count / total_artists) * 100}
-                     for genre, count in limited_genres]
+            limited_genres = genre_counter.most_common(limit)
+            total_artists = len(top_artists)
+            top_items = [{'name': genre, 'count': count, 'percentage': (count / total_artists) * 100}
+                         for genre, count in limited_genres]
 
-        def get_spotify_link_for_genres(name, _):
-            return 'https://open.spotify.com/'
-        get_spotify_link = get_spotify_link_for_genres
+            def get_spotify_link_for_genres(name, _):
+                return 'https://open.spotify.com/'
+            get_spotify_link = get_spotify_link_for_genres
 
-    elif metric == 'stats':
-        id = "top_stats"
-        top_data = sp.current_user_top_tracks(limit=limit, time_range=duration)
-        top = top_data['items']
-        insights = calculate_insights(sp, top)
+        elif metric == 'stats':
+            id = "top_stats"
+            
+            @retry_on_failure(max_retries=3, delay=1)
+            def get_top_tracks_for_stats():
+                return sp.current_user_top_tracks(limit=limit, time_range=duration)
+            
+            top_data = get_top_tracks_for_stats()
+            top = top_data['items']
+            insights = calculate_insights(sp, top)
 
-        top_items = [
-            {'name': 'Popularity Score',
-                'value': f"{insights['popularity_score']:.2f}/100"},
-            {'name': 'Average Track Age',
-                'value': f"{insights['average_track_age']:.1f} YRS"},
-            {'name': 'Tempo', 'value': f"{insights['tempo']:.1f} BPM"},
-            {'name': 'Happiness', 'value': f"{insights['happiness']:.2f}"},
-            {'name': 'Danceability',
-                'value': f"{insights['danceability']:.2f}"},
-            {'name': 'Energy', 'value': f"{insights['energy']:.2f}"},
-            {'name': 'Acousticness',
-                'value': f"{insights['acousticness']:.2f}"},
-            {'name': 'Instrumentalness',
-                'value': f"{insights['instrumentalness']:.2f}"}
-        ]
+            top_items = [
+                {'name': 'Popularity Score',
+                    'value': f"{insights['popularity_score']:.2f}/100"},
+                {'name': 'Average Track Age',
+                    'value': f"{insights['average_track_age']:.1f} YRS"},
+                {'name': 'Tempo', 'value': f"{insights['tempo']:.1f} BPM"},
+                {'name': 'Happiness', 'value': f"{insights['happiness']:.2f}"},
+                {'name': 'Danceability',
+                    'value': f"{insights['danceability']:.2f}"},
+                {'name': 'Energy', 'value': f"{insights['energy']:.2f}"},
+                {'name': 'Acousticness',
+                    'value': f"{insights['acousticness']:.2f}"},
+                {'name': 'Instrumentalness',
+                    'value': f"{insights['instrumentalness']:.2f}"}
+            ]
 
-        def get_spotify_link_for_stats(name, _):
-            return 'https://open.spotify.com/'
-        get_spotify_link = get_spotify_link_for_stats
+            def get_spotify_link_for_stats(name, _):
+                return 'https://open.spotify.com/'
+            get_spotify_link = get_spotify_link_for_stats
 
-    else:
-        id = "top_artists"
-        top_data = sp.current_user_top_artists(
-            limit=limit, time_range=duration)
-        top_items = top_data['items']
-        get_spotify_link = get_spotify_artist_link
+        else:
+            id = "top_artists"
+            
+            @retry_on_failure(max_retries=3, delay=1)
+            def get_top_artists():
+                return sp.current_user_top_artists(limit=limit, time_range=duration)
+            
+            top_data = get_top_artists()
+            top_items = top_data['items']
+            get_spotify_link = get_spotify_artist_link
 
-    current_time = datetime.now().strftime('%A, %B %d, %Y')
+        current_time = datetime.now().strftime('%A, %B %d, %Y')
 
-    random_card_number = generate_random_card_number()
-    random_auth_code = generate_random_auth_code()
+        random_card_number = generate_random_card_number()
+        random_auth_code = generate_random_auth_code()
 
-    return render_template('billify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
-                           duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
-                           auth_code=random_auth_code, metric=metric, limit=limit, get_spotify_link=get_spotify_link)
+        return render_template('billify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
+                               duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
+                               auth_code=random_auth_code, metric=metric, limit=limit, get_spotify_link=get_spotify_link)
+    
+    except Exception as e:
+        print(f"Error in billify route: {e}")
+        return redirect(url_for('login'))  # Redirect to login if there's a major error
 
 if __name__ == '__main__':
     app.run(debug=True)
