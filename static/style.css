@@ -285,6 +285,8 @@ footer p {
   border: 1px solid rgba(0,0,0,0.2);
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  max-width: 100%;
+  height: auto;
 }
 
 footer .wave {
@@ -981,5 +983,47 @@ td.name {
 
   .description p {
     padding: 15px;
+  }
+}
+
+/* Mobile styles for flag counter */
+@media (max-width: 768px) {
+  .flag-counter-wrapper {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  #flag-counter-img {
+    max-width: 200px;
+    width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .flag-counter-wrapper {
+    margin-top: 15px;
+    margin-bottom: 8px;
+  }
+
+  #flag-counter-img {
+    max-width: 150px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .flag-counter-wrapper {
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+
+  #flag-counter-img {
+    max-width: 120px;
+    width: 100%;
   }
 }
