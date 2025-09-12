@@ -278,6 +278,7 @@ footer p {
   position: absolute;
   right: 16px;
   bottom: 12px;
+  z-index: 1000;
 }
 
 #flag-counter-img {
@@ -287,6 +288,14 @@ footer p {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   max-width: 100%;
   height: auto;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#flag-counter-fallback {
+  max-width: 120px;
+  font-family: Arial, sans-serif;
+  transition: opacity 0.3s ease;
 }
 
 footer .wave {
@@ -995,6 +1004,7 @@ td.name {
     text-align: center;
     margin-top: 20px;
     margin-bottom: 10px;
+    z-index: 1000;
   }
 
   #flag-counter-img {
@@ -1026,4 +1036,15 @@ td.name {
     max-width: 120px;
     width: 100%;
   }
+}
+
+/* Ensure flag counter is visible in all scenarios */
+.flag-counter-wrapper {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+#flag-counter-img {
+  visibility: visible !important;
+  opacity: 1 !important;
 }

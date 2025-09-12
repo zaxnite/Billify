@@ -94,8 +94,17 @@
         <!-- Flag Counter: constant style across themes -->
         <div class="flag-counter-wrapper">
           <a href="https://info.flagcounter.com/HTLF" target="_blank" rel="noopener">
-            <img id="flag-counter-img" src="https://s01.flagcounter.com/count/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/" alt="Flag Counter"/>
+            <img id="flag-counter-img" 
+                 src="https://s01.flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/" 
+                 alt="Flag Counter" 
+                 loading="lazy"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                 onload="this.style.opacity='1'; this.nextElementSibling.style.display='none';"/>
           </a>
+          <div id="flag-counter-fallback" style="display:none; font-size:12px; color:#666; text-align:center; padding:10px; border:1px solid #ddd; border-radius:4px; background:#f9f9f9;">
+            Visitor Counter<br>
+            <small>Tracking visitors from around the world</small>
+          </div>
         </div>
       </footer>
     </div>

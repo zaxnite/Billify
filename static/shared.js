@@ -42,4 +42,31 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Flag counter error handling and fallback
+  const flagCounterImg = document.getElementById('flag-counter-img');
+  if (flagCounterImg) {
+    // Add error handling for flag counter image
+    flagCounterImg.onerror = function() {
+      console.log('Flag counter failed to load, trying fallback...');
+      // Try alternative URLs or hide gracefully
+      this.style.display = 'none';
+      
+      // Optionally create a fallback element
+      const fallback = document.createElement('div');
+      fallback.innerHTML = 'Visitor counter temporarily unavailable';
+      fallback.style.cssText = 'font-size: 12px; color: #666; text-align: center; padding: 5px;';
+      this.parentElement.appendChild(fallback);
+    };
+    
+    // Ensure image is loaded properly
+    flagCounterImg.onload = function() {
+      console.log('Flag counter loaded successfully');
+      this.style.opacity = '1';
+    };
+    
+    // Set initial opacity to 0 and let onload make it visible
+    flagCounterImg.style.opacity = '0';
+    flagCounterImg.style.transition = 'opacity 0.3s ease';
+  }
 });
