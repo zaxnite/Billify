@@ -8,6 +8,7 @@ from collections import Counter
 from dotenv import load_dotenv
 import os
 import re
+import requests
 from functools import wraps
 
 
@@ -40,6 +41,21 @@ app.config.update({
     'SESSION_COOKIE_SAMESITE': 'Lax',
     'PREFERRED_URL_SCHEME': 'https',
 })
+
+# Add security headers for better flag counter compatibility
+@app.after_request
+def after_request(response):
+    # Allow external images for flag counter
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    # Remove any restrictive CSP that might block flag counter
+    if 'Content-Security-Policy' in response.headers:
+        csp = response.headers['Content-Security-Policy']
+        if 'img-src' in csp and 'flagcounter.com' not in csp:
+            csp = csp.replace('img-src', 'img-src *.flagcounter.com')
+            response.headers['Content-Security-Policy'] = csp
+    return response
+
 TOKEN_INFO = 'token_info'
 
 # Spotify Authentication Scopes
@@ -268,6 +284,33 @@ def privacy():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+
+@app.route('/debug-flag-counter')
+def debug_flag_counter():
+    """Debug endpoint to test flag counter visibility"""
+    try:
+        # Test if flag counter URL is accessible
+        flag_url = "https://s01.flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/"
+        response = requests.get(flag_url, timeout=10)
+        
+        return jsonify({
+            'status': 'success',
+            'flag_counter_accessible': response.status_code == 200,
+            'response_code': response.status_code,
+            'content_type': response.headers.get('content-type', 'unknown'),
+            'content_length': len(response.content),
+            'user_agent': request.headers.get('User-Agent', 'unknown'),
+            'ip_address': request.remote_addr,
+            'referrer': request.referrer
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'user_agent': request.headers.get('User-Agent', 'unknown'),
+            'ip_address': request.remote_addr
+        })
 
 
 @app.route('/login')

@@ -43,30 +43,75 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Flag counter error handling and fallback
+  // Enhanced flag counter handling with debugging
   const flagCounterImg = document.getElementById('flag-counter-img');
+  const flagCounterFallback = document.getElementById('flag-counter-fallback');
+  
   if (flagCounterImg) {
-    // Add error handling for flag counter image
-    flagCounterImg.onerror = function() {
-      console.log('Flag counter failed to load, trying fallback...');
-      // Try alternative URLs or hide gracefully
-      this.style.display = 'none';
-      
-      // Optionally create a fallback element
-      const fallback = document.createElement('div');
-      fallback.innerHTML = 'Visitor counter temporarily unavailable';
-      fallback.style.cssText = 'font-size: 12px; color: #666; text-align: center; padding: 5px;';
-      this.parentElement.appendChild(fallback);
-    };
+    console.log('Flag counter element found, setting up handlers...');
     
-    // Ensure image is loaded properly
+    // Set initial styles
+    flagCounterImg.style.opacity = '0';
+    flagCounterImg.style.transition = 'opacity 0.3s ease';
+    
+    // Success handler
     flagCounterImg.onload = function() {
       console.log('Flag counter loaded successfully');
       this.style.opacity = '1';
+      if (flagCounterFallback) {
+        flagCounterFallback.style.display = 'none';
+      }
     };
     
-    // Set initial opacity to 0 and let onload make it visible
-    flagCounterImg.style.opacity = '0';
-    flagCounterImg.style.transition = 'opacity 0.3s ease';
+    // Error handler
+    flagCounterImg.onerror = function() {
+      console.log('Flag counter failed to load, showing fallback...');
+      this.style.display = 'none';
+      if (flagCounterFallback) {
+        flagCounterFallback.style.display = 'block';
+      }
+    };
+    
+    // Timeout fallback - if image doesn't load within 10 seconds
+    setTimeout(function() {
+      if (flagCounterImg.style.opacity === '0' || flagCounterImg.style.opacity === '') {
+        console.log('Flag counter timeout, showing fallback...');
+        flagCounterImg.style.display = 'none';
+        if (flagCounterFallback) {
+          flagCounterFallback.style.display = 'block';
+        }
+      }
+    }, 10000);
+    
+    // Alternative URLs to try if the main one fails
+    const alternativeUrls = [
+      'https://s11.flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/',
+      'https://s05.flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/',
+      'https://flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/'
+    ];
+    
+    let urlIndex = 0;
+    function tryNextUrl() {
+      if (urlIndex < alternativeUrls.length) {
+        console.log('Trying alternative URL:', alternativeUrls[urlIndex]);
+        flagCounterImg.src = alternativeUrls[urlIndex];
+        urlIndex++;
+      }
+    }
+    
+    // If the main URL fails, try alternatives
+    const originalOnerror = flagCounterImg.onerror;
+    flagCounterImg.onerror = function() {
+      if (urlIndex < alternativeUrls.length) {
+        tryNextUrl();
+      } else {
+        originalOnerror.call(this);
+      }
+    };
   }
+  
+  // Debug information for troubleshooting
+  console.log('Page loaded, checking flag counter visibility...');
+  console.log('User Agent:', navigator.userAgent);
+  console.log('Location:', window.location.href);
 });
