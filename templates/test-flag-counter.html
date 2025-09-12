@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Counter Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .flag-test {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Flag Counter Visibility Test</h1>
+        
+        <div class="flag-test">
+            <h3>Original Flag Counter (count2):</h3>
+            <img src="https://s01.flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/" 
+                 alt="Flag Counter" 
+                 onload="this.nextElementSibling.innerHTML='✅ Loaded successfully'"
+                 onerror="this.nextElementSibling.innerHTML='❌ Failed to load'">
+            <div class="debug-info">Loading...</div>
+        </div>
+        
+        <div class="flag-test">
+            <h3>Fallback Flag Counter (count):</h3>
+            <img src="https://s01.flagcounter.com/count/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/" 
+                 alt="Flag Counter" 
+                 onload="this.nextElementSibling.innerHTML='✅ Loaded successfully'"
+                 onerror="this.nextElementSibling.innerHTML='❌ Failed to load'">
+            <div class="debug-info">Loading...</div>
+        </div>
+        
+        <div class="flag-test">
+            <h3>Alternative Server (s11):</h3>
+            <img src="https://s11.flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/" 
+                 alt="Flag Counter" 
+                 onload="this.nextElementSibling.innerHTML='✅ Loaded successfully'"
+                 onerror="this.nextElementSibling.innerHTML='❌ Failed to load'">
+            <div class="debug-info">Loading...</div>
+        </div>
+        
+        <div class="debug-info">
+            <h3>Debug Information:</h3>
+            <p><strong>User Agent:</strong> <span id="user-agent"></span></p>
+            <p><strong>Location:</strong> <span id="location"></span></p>
+            <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+            <p><strong>Screen Size:</strong> <span id="screen-size"></span></p>
+        </div>
+        
+        <button onclick="testFlagCounterAPI()">Test Flag Counter API</button>
+        <div id="api-test-result" class="debug-info" style="display:none;"></div>
+        
+        <p><a href="{{ url_for('home') }}">← Back to Home</a></p>
+    </div>
+    
+    <script>
+        // Fill in debug information
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('location').textContent = window.location.href;
+        document.getElementById('timestamp').textContent = new Date().toISOString();
+        document.getElementById('screen-size').textContent = screen.width + 'x' + screen.height;
+        
+        function testFlagCounterAPI() {
+            const resultDiv = document.getElementById('api-test-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Testing...';
+            
+            fetch('/debug-flag-counter')
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.innerHTML = '<h4>API Test Results:</h4><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = '<h4>API Test Error:</h4><pre>' + error.toString() + '</pre>';
+                });
+        }
+    </script>
+</body>
+</html>

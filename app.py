@@ -313,6 +313,12 @@ def debug_flag_counter():
         })
 
 
+@app.route('/test-flag-counter')
+def test_flag_counter():
+    """Test page for flag counter visibility"""
+    return render_template('test-flag-counter.html')
+
+
 @app.route('/login')
 def login():
     clear_cache()
