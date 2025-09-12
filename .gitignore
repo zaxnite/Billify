@@ -1,7 +1,9 @@
-### Essentials only for this repo
+### Essentials for this repo
 
 # Python caches
 __pycache__/
+*.py[cod]
+*$py.class
 
 # Virtual environments
 .venv/
@@ -9,11 +11,32 @@ __pycache__/
 
 # Environment files / secrets
 .env
+.env.*
 credentials.py
+credentials_local.py
 
 # Spotipy / OAuth cache
 .cache*
 
 # Flask instance
 instance/
+
+# Local databases
+*.db
+*.sqlite3
+*.sqlite
+
+# Logs
+*.log
+logs/
+
+# IDE / editor noise
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
 
