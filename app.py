@@ -46,7 +46,7 @@ TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
 
 # Redirect URI from environment with local fallback
-REDIRECT_URI = os.getenv('REDIRECT_URI', 'http://127.0.0.1:5000/redirectPage')
+REDIRECT_URI = os.getenv('REDIRECT_URI', 'https://billify-388bd942b87f.herokuapp.com/redirectPage')
 
 
 def retry_on_failure(max_retries=3, delay=1):
