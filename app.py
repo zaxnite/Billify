@@ -5,22 +5,48 @@ import time
 from datetime import datetime
 import random
 from collections import Counter
-from credentials import CLIENT_ID, CLIENT_SECRET, SECRET_KEY
+from dotenv import load_dotenv
 import os
 import re
 from functools import wraps
 
 
+# Load environment variables from .env (local) and system
+load_dotenv()
+
+# Secrets: prefer environment, fallback to credentials.py for local dev
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+if not (CLIENT_ID and CLIENT_SECRET and SECRET_KEY):
+    try:
+        from credentials import CLIENT_ID as _CID, CLIENT_SECRET as _CS, SECRET_KEY as _SK
+        CLIENT_ID = CLIENT_ID or _CID
+        CLIENT_SECRET = CLIENT_SECRET or _CS
+        SECRET_KEY = SECRET_KEY or _SK
+    except Exception:
+        raise RuntimeError(
+            "Missing CLIENT_ID/CLIENT_SECRET/SECRET_KEY. Set env vars or provide credentials.py"
+        )
+
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie'
+# Secure cookie and URL scheme settings (effective in production/HTTPS)
+app.config.update({
+    'SESSION_COOKIE_SECURE': True,
+    'SESSION_COOKIE_HTTPONLY': True,
+    'SESSION_COOKIE_SAMESITE': 'Lax',
+    'PREFERRED_URL_SCHEME': 'https',
+})
 TOKEN_INFO = 'token_info'
 
 # Spotify Authentication Scopes
 SCOPE = 'user-top-read'
 
-# # Hard-coded redirect URI
-REDIRECT_URI = 'http://127.0.0.1:5000/redirectPage'
+# Redirect URI from environment with local fallback
+REDIRECT_URI = os.getenv('REDIRECT_URI', 'http://127.0.0.1:5000/redirectPage')
 
 
 def retry_on_failure(max_retries=3, delay=1):

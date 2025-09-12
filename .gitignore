@@ -1,1 +1,19 @@
-.cache
+### Essentials only for this repo
+
+# Python caches
+__pycache__/
+
+# Virtual environments
+.venv/
+
+
+# Environment files / secrets
+.env
+credentials.py
+
+# Spotipy / OAuth cache
+.cache*
+
+# Flask instance
+instance/
+

@@ -273,6 +273,20 @@ footer p {
   font-weight: 600;
 }
 
+/* Flag counter placement and styling */
+.flag-counter-wrapper {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+}
+
+#flag-counter-img {
+  display: block;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
 footer .wave {
   position: absolute;
   top: -80px;

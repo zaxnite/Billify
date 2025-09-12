@@ -123,7 +123,7 @@
         </div>
     </div>
     <div class="space"></div>
-    <footer>
+  <footer>
         <div class="waves">
           <div class="wave" id="wave1"></div>
           <div class="wave" id="wave2"></div>
@@ -151,9 +151,14 @@
           <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
         </ul>
         <p>Made by Aathif Khan</p>
+        <div class="flag-counter-wrapper">
+          <a href="https://info.flagcounter.com/HTLF" target="_blank" rel="noopener">
+            <img id="flag-counter-img" src="https://s01.flagcounter.com/count/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/" alt="Flag Counter"/>
+          </a>
+        </div>
       </footer>
 
-    <script>
+  <script>
         document.querySelectorAll(".time-button, .length-button").forEach((button) => {
             button.addEventListener("click", function () {
                 const buttonType = this.classList.contains("time-button") ? ".time-button" : ".length-button";
@@ -337,30 +342,7 @@
             }
         });
 
-              document.addEventListener('DOMContentLoaded', function() {
-        const checkbox = document.getElementById('checkbox');
-        const body = document.body;
-        
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        
-        if (currentTheme === 'dark') {
-          body.classList.add('dark-mode');
-          checkbox.checked = true;
-        }
-        
-        // Listen for toggle changes
-        checkbox.addEventListener('change', function() {
-          if (this.checked) {
-            body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
-          } else {
-            body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
-          }
-        });
-      });
-
-    </script>
+  </script>
+  <script src="{{ url_for('static', filename='shared.js') }}"></script>
 </body>
 </html>

@@ -55,7 +55,7 @@
         </div>
       </div>
 
-      <footer>
+  <footer>
         <div class="waves">
           <div class="wave" id="wave1"></div>
           <div class="wave" id="wave2"></div>
@@ -91,45 +91,14 @@
           <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
         </ul>
         <p>Made by Aathif Khan</p>
+        <!-- Flag Counter: constant style across themes -->
+        <div class="flag-counter-wrapper">
+          <a href="https://info.flagcounter.com/HTLF" target="_blank" rel="noopener">
+            <img id="flag-counter-img" src="https://s01.flagcounter.com/count/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/" alt="Flag Counter"/>
+          </a>
+        </div>
       </footer>
     </div>
-    <script>
-      const toggleBtn = document.querySelector(".toggle_btn");
-      const toggleBtnIcon = document.querySelector(".toggle_btn i");
-      const dropDownMenu = document.querySelector(".dropdown_menu");
-
-      toggleBtn.onclick = function () {
-        dropDownMenu.classList.toggle("open");
-        const isOpen = dropDownMenu.classList.contains("open");
-
-        toggleBtnIcon.classList = isOpen
-          ? "fa-solid fa-xmark"
-          : "fa-solid fa-bars";
-      };
-
-            document.addEventListener('DOMContentLoaded', function() {
-        const checkbox = document.getElementById('checkbox');
-        const body = document.body;
-        
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        
-        if (currentTheme === 'dark') {
-          body.classList.add('dark-mode');
-          checkbox.checked = true;
-        }
-        
-        // Listen for toggle changes
-        checkbox.addEventListener('change', function() {
-          if (this.checked) {
-            body.classList.add('dark-mode');
-            localStorage.setItem('theme', 'dark');
-          } else {
-            body.classList.remove('dark-mode');
-            localStorage.setItem('theme', 'light');
-          }
-        });
-      });
-    </script>
+    <script src="{{ url_for('static', filename='shared.js') }}"></script>
   </body>
 </html>
