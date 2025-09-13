@@ -48,12 +48,14 @@ def after_request(response):
     # Allow external images for flag counter
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    # Remove any restrictive CSP that might block flag counter
+    # Remove any restrictive CSP that might block flag counter or Google Analytics
     if 'Content-Security-Policy' in response.headers:
         csp = response.headers['Content-Security-Policy']
         if 'img-src' in csp and 'flagcounter.com' not in csp:
             csp = csp.replace('img-src', 'img-src *.flagcounter.com')
-            response.headers['Content-Security-Policy'] = csp
+        if 'script-src' in csp and 'googletagmanager.com' not in csp:
+            csp = csp.replace('script-src', 'script-src *.googletagmanager.com *.google-analytics.com')
+        response.headers['Content-Security-Policy'] = csp
     return response
 
 TOKEN_INFO = 'token_info'
@@ -317,6 +319,68 @@ def debug_flag_counter():
 def test_flag_counter():
     """Test page for flag counter visibility"""
     return render_template('test-flag-counter.html')
+
+
+@app.route('/test-analytics')
+def test_analytics():
+    """Test page to verify Google Analytics is working"""
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Google Analytics Test - Billify</title>
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLC6BEGVZB"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-SLC6BEGVZB');
+        </script>
+    </head>
+    <body>
+        <h1>Google Analytics Test Page</h1>
+        <p>This page tests Google Analytics implementation.</p>
+        <button onclick="testGAEvent()">Test Custom Event</button>
+        <div id="ga-status"></div>
+        
+        <script>
+            // Test if Google Analytics is loaded
+            function checkGoogleAnalytics() {
+                const status = document.getElementById('ga-status');
+                if (typeof gtag === 'function') {
+                    status.innerHTML = '<p style="color: green;">✅ Google Analytics is loaded successfully!</p>';
+                    // Send a test pageview
+                    gtag('event', 'page_view', {
+                        page_title: 'Analytics Test Page',
+                        page_location: window.location.href
+                    });
+                } else {
+                    status.innerHTML = '<p style="color: red;">❌ Google Analytics failed to load.</p>';
+                }
+            }
+            
+            function testGAEvent() {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'test_button_click', {
+                        event_category: 'engagement',
+                        event_label: 'analytics_test'
+                    });
+                    alert('Test event sent to Google Analytics!');
+                } else {
+                    alert('Google Analytics not loaded!');
+                }
+            }
+            
+            // Check GA status when page loads
+            setTimeout(checkGoogleAnalytics, 2000);
+        </script>
+        
+        <p><a href="{{ url_for('home') }}">← Back to Home</a></p>
+    </body>
+    </html>
+    '''
 
 
 @app.route('/login')

@@ -169,9 +169,13 @@ body,
 html {
   margin: 0;
   padding: 0;
-  height: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  /* Remove fixed height for mobile compatibility */
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 body {
@@ -181,6 +185,15 @@ body {
   color: var(--text-primary);
   background-color: var(--bg-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
+  /* Remove fixed height constraints */
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+  position: relative;
 }
 
 body.scroll {
@@ -191,13 +204,20 @@ body.scroll {
 .wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Full height */
+  min-height: 100vh;
+  width: 100%;
+  overflow-y: visible; /* Allow content to overflow and scroll */
+  position: relative;
 }
 
 /* Allow center to grow and take available space */
 .center {
   flex: 1;
-  padding-bottom: 50px;
+  padding: 20px;
+  padding-bottom: 80px; /* More space before footer */
+  max-width: 100%;
+  overflow-wrap: break-word; /* Handle long text */
+  word-wrap: break-word;
 }
 
 /* Ensure footer sticks to the bottom */
@@ -579,8 +599,9 @@ header {
   margin-bottom: 20px; /* Optional: Add more space below h2 */
   font-weight: bold;
   margin-top: 10px;
-  width: 55%;
-  line-height: 2;
+  width: 90%; /* More responsive width */
+  max-width: 800px; /* Maximum width for readability */
+  line-height: 1.6; /* Better line spacing */
 }
 
 .center h2 .index {
@@ -960,6 +981,39 @@ td.name {
 }
 
 @media (max-width: 768px) {
+  /* Force proper mobile scrolling */
+  html {
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  body {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+  }
+  
+  .wrapper {
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-y: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .center {
+    flex: 1 !important;
+    padding: 15px !important;
+    padding-bottom: 120px !important; /* Extra space on mobile */
+    height: auto !important;
+    overflow: visible !important;
+  }
+  
   .flex-container {
     flex-direction: column; /* Stack the boxes vertically */
     align-items: center; /* Center align the boxes */
@@ -993,28 +1047,48 @@ td.name {
   .description p {
     padding: 15px;
   }
-}
-
-/* Mobile styles for flag counter */
-@media (max-width: 768px) {
-  .flag-counter-wrapper {
-    position: relative;
-    right: auto;
-    bottom: auto;
+  
+  /* Privacy page specific mobile styles */
+  .center h1 {
+    font-size: 2rem;
     text-align: center;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    z-index: 1000;
+    margin-bottom: 20px;
+  }
+  
+  .center h2 {
+    width: 95% !important;
+    max-width: none;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: left;
+    padding: 0 10px;
+  }
+  
+  /* Flag counter mobile styles */
+  .flag-counter-wrapper {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    text-align: center !important;
+    margin-top: 20px !important;
+    margin-bottom: 10px !important;
+    z-index: 1000 !important;
   }
 
   #flag-counter-img {
-    max-width: 200px;
-    width: 100%;
-    height: auto;
+    max-width: 200px !important;
+    width: 100% !important;
+    height: auto !important;
   }
 }
 
 @media (max-width: 576px) {
+  /* Force scrolling on smaller devices */
+  html, body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
   .flag-counter-wrapper {
     margin-top: 15px;
     margin-bottom: 8px;
@@ -1027,6 +1101,33 @@ td.name {
 }
 
 @media (max-width: 480px) {
+  /* Ultra-aggressive mobile scrolling fixes */
+  * {
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  html {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+  }
+  
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    position: static !important;
+  }
+  
+  .wrapper {
+    overflow: visible !important;
+    height: auto !important;
+  }
+  
+  .center {
+    padding-bottom: 150px !important;
+  }
+  
   .flag-counter-wrapper {
     margin-top: 10px;
     margin-bottom: 5px;
@@ -1047,4 +1148,122 @@ td.name {
 #flag-counter-img {
   visibility: visible !important;
   opacity: 1 !important;
+}
+
+/* Universal mobile scrolling fix */
+@media screen and (max-width: 768px) {
+  /* Force proper scrolling on all mobile devices */
+  html, body, .wrapper, .center {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Ensure no elements block scrolling */
+  * {
+    touch-action: pan-y !important;
+  }
+  
+  /* Fix for iOS Safari using custom viewport height */
+  body {
+    -webkit-transform: translate3d(0,0,0) !important;
+    transform: translate3d(0,0,0) !important;
+    min-height: 100vh !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important; /* iOS fallback */
+  }
+  
+  .wrapper {
+    min-height: 100vh !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important; /* iOS fallback */
+  }
+}
+
+/* iPhone SE and very small devices (320px and below) */
+@media screen and (max-width: 320px) {
+  /* Ultra-specific iOS fixes */
+  html {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+  }
+  
+  body {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+    -webkit-transform: translate3d(0,0,0) !important;
+    transform: translate3d(0,0,0) !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+  }
+  
+  .wrapper {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .center {
+    flex: 1 !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 10px !important;
+    padding-bottom: 200px !important; /* Extra space for iPhone SE */
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Specific fixes for privacy and about page content */
+  .center h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 15px !important;
+    word-wrap: break-word !important;
+  }
+  
+  .center h2 {
+    width: 100% !important;
+    max-width: none !important;
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+    padding: 0 5px !important;
+    margin-bottom: 15px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}
+
+/* Critical iPhone SE Safari fix */
+@media screen and (max-width: 320px) and (-webkit-min-device-pixel-ratio: 2) {
+  /* iPhone SE specific detection and fixes */
+  html {
+    -webkit-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+  }
+  
+  body {
+    -webkit-overflow-scrolling: touch !important;
+    min-height: calc(100vh - env(safe-area-inset-bottom)) !important;
+  }
+  
+  .wrapper {
+    min-height: calc(100vh - env(safe-area-inset-bottom)) !important;
+  }
+  
+  /* Force scroll container */
+  .center {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+    padding-bottom: 250px !important; /* Extra large bottom padding for iPhone SE */
+  }
 }

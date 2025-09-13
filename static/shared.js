@@ -110,6 +110,82 @@ document.addEventListener('DOMContentLoaded', function() {
     };
   }
   
+  // Mobile scrolling fix
+  function fixMobileScrolling() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isiPhoneSE = window.innerWidth <= 320 && window.innerHeight <= 568;
+    
+    // Ensure body and html can scroll on mobile
+    if (window.innerWidth <= 768 || isIOS) {
+      document.documentElement.style.overflow = 'auto';
+      document.documentElement.style.overflowX = 'hidden';
+      document.documentElement.style.webkitOverflowScrolling = 'touch';
+      document.documentElement.style.height = 'auto';
+      
+      document.body.style.overflow = 'auto';
+      document.body.style.overflowX = 'hidden';
+      document.body.style.webkitOverflowScrolling = 'touch';
+      document.body.style.height = 'auto';
+      document.body.style.position = 'relative';
+      
+      // Special fixes for iPhone SE and very small iOS devices
+      if (isiPhoneSE || (isIOS && window.innerWidth <= 375)) {
+        document.documentElement.style.minHeight = '100%';
+        document.documentElement.style.webkitTransform = 'translateZ(0)';
+        document.documentElement.style.transform = 'translateZ(0)';
+        
+        document.body.style.minHeight = '100vh';
+        document.body.style.webkitTransform = 'translate3d(0,0,0)';
+        document.body.style.transform = 'translate3d(0,0,0)';
+        document.body.style.webkitBackfaceVisibility = 'hidden';
+        document.body.style.backfaceVisibility = 'hidden';
+        
+        // Force reflow
+        document.body.offsetHeight;
+        
+        console.log('iPhone SE/small iOS fixes applied');
+      }
+      
+      console.log('Mobile scrolling fixes applied');
+    }
+  }
+  
+  // Apply mobile fixes
+  fixMobileScrolling();
+  
+  // Specific iOS scroll fix
+  function iosScrollFix() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+      // Force scroll area recognition
+      document.addEventListener('touchstart', function() {}, { passive: true });
+      document.addEventListener('touchmove', function(e) {
+        // Allow scrolling
+        e.stopPropagation();
+      }, { passive: true });
+      
+      // Fix for iOS viewport height issues
+      const updateViewport = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      };
+      
+      updateViewport();
+      window.addEventListener('resize', updateViewport);
+      window.addEventListener('orientationchange', updateViewport);
+      
+      console.log('iOS scroll fixes applied');
+    }
+  }
+  
+  iosScrollFix();
+  
+  // Reapply on resize
+  window.addEventListener('resize', function() {
+    fixMobileScrolling();
+    iosScrollFix();
+  });
+  
   // Debug information for troubleshooting
   console.log('Page loaded, checking flag counter visibility...');
   console.log('User Agent:', navigator.userAgent);
