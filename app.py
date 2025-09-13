@@ -42,22 +42,27 @@ app.config.update({
     'PREFERRED_URL_SCHEME': 'https',
 })
 
-# Add security headers for better flag counter and Google Analytics compatibility
 @app.after_request
 def after_request(response):
     # Allow external images for flag counter
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     
+    # Add CORS headers for better analytics compatibility
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    
     # Ensure Google Analytics and flag counter are allowed
-    # Set a permissive CSP that allows Google Analytics
+    # Set a very permissive CSP that allows Google Analytics data collection
     response.headers['Content-Security-Policy'] = (
-        "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' *.googletagmanager.com *.google-analytics.com; "
-        "img-src 'self' data: *.flagcounter.com *.google-analytics.com *.googletagmanager.com; "
-        "connect-src 'self' *.google-analytics.com *.analytics.google.com *.googletagmanager.com; "
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.google-analytics.com https://www.googletagmanager.com; "
+        "img-src 'self' data: blob: *.flagcounter.com *.google-analytics.com *.googletagmanager.com https://www.google-analytics.com; "
+        "connect-src 'self' *.google-analytics.com *.analytics.google.com *.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com; "
         "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com; "
-        "font-src 'self' cdnjs.cloudflare.com"
+        "font-src 'self' cdnjs.cloudflare.com; "
+        "frame-src 'self' *.google.com *.googletagmanager.com"
     )
     
     return response

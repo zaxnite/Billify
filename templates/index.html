@@ -13,16 +13,47 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'G-SLC6BEGVZB');
+      // Enhanced error handling for Google Analytics
+      gtag('config', 'G-SLC6BEGVZB', {
+        debug_mode: true,
+        transport_type: 'beacon',
+        custom_parameter: 'billify_home'
+      });
+      
+      // Monitor fetch failures
+      const originalFetch = window.fetch;
+      window.fetch = function(...args) {
+        const fetchPromise = originalFetch.apply(this, args);
+        
+        fetchPromise.catch(error => {
+          if (args[0] && args[0].includes('google-analytics.com')) {
+            console.warn('Google Analytics fetch failed:', error);
+            console.log('This might be due to ad blockers, privacy settings, or network restrictions');
+          }
+        });
+        
+        return fetchPromise;
+      };
       
       // Debug: Check if gtag is available
       setTimeout(function() {
         if (typeof gtag === 'function') {
           console.log('✅ Google Analytics loaded successfully');
+          
+          // Try different transport methods
           gtag('event', 'page_view', {
             page_title: 'Home',
-            page_location: window.location.href
+            page_location: window.location.href,
+            transport_type: 'xhr'
           });
+          
+          // Also try with beacon
+          gtag('event', 'app_loaded', {
+            event_category: 'engagement',
+            event_label: 'billify_home',
+            transport_type: 'beacon'
+          });
+          
         } else {
           console.error('❌ Google Analytics failed to load');
         }
