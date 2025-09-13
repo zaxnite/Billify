@@ -42,20 +42,24 @@ app.config.update({
     'PREFERRED_URL_SCHEME': 'https',
 })
 
-# Add security headers for better flag counter compatibility
+# Add security headers for better flag counter and Google Analytics compatibility
 @app.after_request
 def after_request(response):
     # Allow external images for flag counter
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    # Remove any restrictive CSP that might block flag counter or Google Analytics
-    if 'Content-Security-Policy' in response.headers:
-        csp = response.headers['Content-Security-Policy']
-        if 'img-src' in csp and 'flagcounter.com' not in csp:
-            csp = csp.replace('img-src', 'img-src *.flagcounter.com')
-        if 'script-src' in csp and 'googletagmanager.com' not in csp:
-            csp = csp.replace('script-src', 'script-src *.googletagmanager.com *.google-analytics.com')
-        response.headers['Content-Security-Policy'] = csp
+    
+    # Ensure Google Analytics and flag counter are allowed
+    # Set a permissive CSP that allows Google Analytics
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' *.googletagmanager.com *.google-analytics.com; "
+        "img-src 'self' data: *.flagcounter.com *.google-analytics.com *.googletagmanager.com; "
+        "connect-src 'self' *.google-analytics.com *.analytics.google.com *.googletagmanager.com; "
+        "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com; "
+        "font-src 'self' cdnjs.cloudflare.com"
+    )
+    
     return response
 
 TOKEN_INFO = 'token_info'
@@ -330,7 +334,9 @@ def test_analytics():
     <head>
         <title>Google Analytics Test - Billify</title>
         <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLC6BEGVZB"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLC6BEGVZB" 
+                onload="console.log('GA script loaded successfully')" 
+                onerror="console.error('Failed to load GA script')"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -338,26 +344,41 @@ def test_analytics():
 
           gtag('config', 'G-SLC6BEGVZB');
         </script>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+            .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+            .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        </style>
     </head>
     <body>
         <h1>Google Analytics Test Page</h1>
-        <p>This page tests Google Analytics implementation.</p>
+        <p>This page tests Google Analytics implementation for Billify.</p>
+        
         <button onclick="testGAEvent()">Test Custom Event</button>
+        <button onclick="checkNetworkRequests()">Check Network Requests</button>
+        
         <div id="ga-status"></div>
+        <div id="network-status"></div>
         
         <script>
             // Test if Google Analytics is loaded
             function checkGoogleAnalytics() {
                 const status = document.getElementById('ga-status');
+                
+                console.log('Checking Google Analytics...');
+                console.log('typeof gtag:', typeof gtag);
+                console.log('dataLayer:', window.dataLayer);
+                
                 if (typeof gtag === 'function') {
-                    status.innerHTML = '<p style="color: green;">✅ Google Analytics is loaded successfully!</p>';
+                    status.innerHTML = '<div class="status success">✅ Google Analytics is loaded successfully!</div>';
                     // Send a test pageview
                     gtag('event', 'page_view', {
                         page_title: 'Analytics Test Page',
                         page_location: window.location.href
                     });
                 } else {
-                    status.innerHTML = '<p style="color: red;">❌ Google Analytics failed to load.</p>';
+                    status.innerHTML = '<div class="status error">❌ Google Analytics failed to load. Check console for errors.</div>';
                 }
             }
             
@@ -373,9 +394,28 @@ def test_analytics():
                 }
             }
             
+            function checkNetworkRequests() {
+                const networkStatus = document.getElementById('network-status');
+                networkStatus.innerHTML = '<div class="status">Check the Network tab in DevTools for requests to:<br>- www.googletagmanager.com<br>- www.google-analytics.com</div>';
+            }
+            
             // Check GA status when page loads
-            setTimeout(checkGoogleAnalytics, 2000);
+            setTimeout(checkGoogleAnalytics, 3000);
+            
+            // Also check immediately for sync issues
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(checkGoogleAnalytics, 1000);
+            });
         </script>
+        
+        <h3>Manual Checks:</h3>
+        <ol>
+            <li>Open DevTools (F12) → Console tab</li>
+            <li>Type: <code>typeof gtag</code> and press Enter</li>
+            <li>Should return: <code>function</code></li>
+            <li>Go to Network tab and reload page</li>
+            <li>Look for requests to googletagmanager.com</li>
+        </ol>
         
         <p><a href="{{ url_for('home') }}">← Back to Home</a></p>
     </body>
