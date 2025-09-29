@@ -48,21 +48,15 @@ def after_request(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     
-    # Add CORS headers for better analytics compatibility
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-    
-    # Ensure Google Analytics and flag counter are allowed
-    # Set a very permissive CSP that allows Google Analytics data collection
+    # Basic CSP that allows Google Fonts and flag counter
     response.headers['Content-Security-Policy'] = (
         "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.googletagmanager.com *.google-analytics.com https://www.googletagmanager.com; "
-        "img-src 'self' data: blob: *.flagcounter.com *.google-analytics.com *.googletagmanager.com https://www.google-analytics.com; "
-        "connect-src 'self' *.google-analytics.com *.analytics.google.com *.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com; "
-        "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com; "
-        "font-src 'self' cdnjs.cloudflare.com; "
-        "frame-src 'self' *.google.com *.googletagmanager.com"
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "img-src 'self' data: blob: *.flagcounter.com; "
+        "connect-src 'self'; "
+        "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; "
+        "font-src 'self' cdnjs.cloudflare.com fonts.gstatic.com data:; "
+        "frame-src 'self'"
     )
     
     return response
@@ -328,104 +322,6 @@ def debug_flag_counter():
 def test_flag_counter():
     """Test page for flag counter visibility"""
     return render_template('test-flag-counter.html')
-
-
-@app.route('/test-analytics')
-def test_analytics():
-    """Test page to verify Google Analytics is working"""
-    return '''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Google Analytics Test - Billify</title>
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLC6BEGVZB" 
-                onload="console.log('GA script loaded successfully')" 
-                onerror="console.error('Failed to load GA script')"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'G-SLC6BEGVZB');
-        </script>
-        <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
-            .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-            .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        </style>
-    </head>
-    <body>
-        <h1>Google Analytics Test Page</h1>
-        <p>This page tests Google Analytics implementation for Billify.</p>
-        
-        <button onclick="testGAEvent()">Test Custom Event</button>
-        <button onclick="checkNetworkRequests()">Check Network Requests</button>
-        
-        <div id="ga-status"></div>
-        <div id="network-status"></div>
-        
-        <script>
-            // Test if Google Analytics is loaded
-            function checkGoogleAnalytics() {
-                const status = document.getElementById('ga-status');
-                
-                console.log('Checking Google Analytics...');
-                console.log('typeof gtag:', typeof gtag);
-                console.log('dataLayer:', window.dataLayer);
-                
-                if (typeof gtag === 'function') {
-                    status.innerHTML = '<div class="status success">✅ Google Analytics is loaded successfully!</div>';
-                    // Send a test pageview
-                    gtag('event', 'page_view', {
-                        page_title: 'Analytics Test Page',
-                        page_location: window.location.href
-                    });
-                } else {
-                    status.innerHTML = '<div class="status error">❌ Google Analytics failed to load. Check console for errors.</div>';
-                }
-            }
-            
-            function testGAEvent() {
-                if (typeof gtag === 'function') {
-                    gtag('event', 'test_button_click', {
-                        event_category: 'engagement',
-                        event_label: 'analytics_test'
-                    });
-                    alert('Test event sent to Google Analytics!');
-                } else {
-                    alert('Google Analytics not loaded!');
-                }
-            }
-            
-            function checkNetworkRequests() {
-                const networkStatus = document.getElementById('network-status');
-                networkStatus.innerHTML = '<div class="status">Check the Network tab in DevTools for requests to:<br>- www.googletagmanager.com<br>- www.google-analytics.com</div>';
-            }
-            
-            // Check GA status when page loads
-            setTimeout(checkGoogleAnalytics, 3000);
-            
-            // Also check immediately for sync issues
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(checkGoogleAnalytics, 1000);
-            });
-        </script>
-        
-        <h3>Manual Checks:</h3>
-        <ol>
-            <li>Open DevTools (F12) → Console tab</li>
-            <li>Type: <code>typeof gtag</code> and press Enter</li>
-            <li>Should return: <code>function</code></li>
-            <li>Go to Network tab and reload page</li>
-            <li>Look for requests to googletagmanager.com</li>
-        </ol>
-        
-        <p><a href="{{ url_for('home') }}">← Back to Home</a></p>
-    </body>
-    </html>
-    '''
 
 
 @app.route('/login')

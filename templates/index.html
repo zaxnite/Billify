@@ -2,63 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLC6BEGVZB" 
-            onload="console.log('GA script loaded successfully')" 
-            onerror="console.error('Failed to load GA script')"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      // Enhanced error handling for Google Analytics
-      gtag('config', 'G-SLC6BEGVZB', {
-        debug_mode: true,
-        transport_type: 'beacon',
-        custom_parameter: 'billify_home'
-      });
-      
-      // Monitor fetch failures
-      const originalFetch = window.fetch;
-      window.fetch = function(...args) {
-        const fetchPromise = originalFetch.apply(this, args);
-        
-        fetchPromise.catch(error => {
-          if (args[0] && args[0].includes('google-analytics.com')) {
-            console.warn('Google Analytics fetch failed:', error);
-            console.log('This might be due to ad blockers, privacy settings, or network restrictions');
-          }
-        });
-        
-        return fetchPromise;
-      };
-      
-      // Debug: Check if gtag is available
-      setTimeout(function() {
-        if (typeof gtag === 'function') {
-          console.log('✅ Google Analytics loaded successfully');
-          
-          // Try different transport methods
-          gtag('event', 'page_view', {
-            page_title: 'Home',
-            page_location: window.location.href,
-            transport_type: 'xhr'
-          });
-          
-          // Also try with beacon
-          gtag('event', 'app_loaded', {
-            event_category: 'engagement',
-            event_label: 'billify_home',
-            transport_type: 'beacon'
-          });
-          
-        } else {
-          console.error('❌ Google Analytics failed to load');
-        }
-      }, 2000);
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     
     <link
       rel="stylesheet"
