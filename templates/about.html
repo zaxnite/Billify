@@ -1,8 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    
+    <!-- SEO Meta Tags -->
+    <title>About Billify - Spotify Music Analytics Tool</title>
+    <meta name="description" content="Learn about Billify, the ultimate Spotify analytics tool. Discover how we help you explore your music taste, analyze listening patterns, and create beautiful music reports." />
+    <meta name="keywords" content="about billify, spotify analytics tool, music statistics app, developer, music analysis" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="About Billify - Spotify Music Analytics Tool" />
+    <meta property="og:description" content="Learn about Billify and how we help you explore your Spotify music taste with detailed analytics." />
+    <meta property="og:image" content="{{ url_for('static', filename='icon.ico', _external=True) }}" />
+    <meta property="og:url" content="{{ request.url }}" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url_for('about', _external=True) }}" />
     
     <link
       rel="stylesheet"
@@ -16,7 +32,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <title>About Billify</title>
+    <title>About | Billify</title>
   </head>
   <body>
     <div class="wrapper">

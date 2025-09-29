@@ -4,6 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     
+    <!-- SEO Meta Tags -->
+    <title>Billify - Your Spotify Music Statistics & Analytics</title>
+    <meta name="description" content="Discover your Spotify music taste with Billify! Get detailed analytics of your top tracks, artists, genres, and listening habits. Create beautiful music reports and share your musical journey." />
+    <meta name="keywords" content="spotify analytics, music statistics, top tracks, top artists, spotify wrapped, music analysis, listening habits, spotify data, music insights" />
+    <meta name="author" content="Aathif Khan" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph Meta Tags (Facebook, LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Billify - Your Spotify Music Statistics & Analytics" />
+    <meta property="og:description" content="Discover your Spotify music taste with detailed analytics of your top tracks, artists, and genres." />
+    <meta property="og:image" content="{{ url_for('static', filename='icon.ico', _external=True) }}" />
+    <meta property="og:url" content="{{ request.url }}" />
+    <meta property="og:site_name" content="Billify" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Billify - Your Spotify Music Statistics & Analytics" />
+    <meta name="twitter:description" content="Discover your Spotify music taste with detailed analytics of your top tracks, artists, and genres." />
+    <meta name="twitter:image" content="{{ url_for('static', filename='icon.ico', _external=True) }}" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url_for('home', _external=True) }}" />
+    
+    <!-- Additional SEO -->
+    <meta name="theme-color" content="#1DB954" />
+    <meta name="application-name" content="Billify" />
+    
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -16,7 +44,36 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <title>Billify</title>
+    
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Billify",
+      "description": "Spotify music analytics and statistics application that helps users discover their music taste",
+      "url": "{{ url_for('home', _external=True) }}",
+      "applicationCategory": "MusicApplication",
+      "operatingSystem": "Web Browser",
+      "author": {
+        "@type": "Person",
+        "name": "Aathif Khan"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/OnlineOnly"
+      },
+      "featureList": [
+        "Top Tracks Analysis",
+        "Top Artists Statistics", 
+        "Genre Distribution",
+        "Music Listening Insights",
+        "Audio Feature Analysis"
+      ]
+    }
+    </script>
   </head>
   <body>
     <div class="wrapper">

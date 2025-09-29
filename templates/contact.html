@@ -1,8 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    
+    <!-- SEO Meta Tags -->
+    <title>Contact Billify - Get in Touch</title>
+    <meta name="description" content="Contact the Billify team. Get support, ask questions, or share feedback about your Spotify music analytics experience." />
+    <meta name="keywords" content="contact billify, support, feedback, spotify analytics help, get in touch" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Contact Billify - Get in Touch" />
+    <meta property="og:description" content="Contact the Billify team for support or feedback about your Spotify music analytics." />
+    <meta property="og:url" content="{{ request.url }}" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url_for('contact', _external=True) }}" />
     
     <link
       rel="stylesheet"
@@ -16,7 +31,7 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <title>Privacy Policy</title>
+    <title>Contact | Billify</title>
   </head>
   <body>
     <div class="wrapper">

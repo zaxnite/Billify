@@ -1,6 +1,20 @@
+/* SEO Performance Optimizations */
 @import url("https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
+
+/* Improve font loading performance */
+* {
+  font-display: swap;
+}
+
+/* Accessibility improvements for SEO */
+a:focus,
+button:focus,
+input:focus {
+  outline: 2px solid #1DB954;
+  outline-offset: 2px;
+}
 
 /* COLOR VARIABLES */
 :root {
