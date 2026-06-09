@@ -1,11 +1,16 @@
 /* SEO Performance Optimizations */
-@import url("https://fonts.googleapis.com/css2?family=Anonymous+Pro&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 /* Improve font loading performance */
 * {
   font-display: swap;
+}
+
+/* Base font fallbacks */
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Accessibility improvements for SEO */
@@ -631,7 +636,7 @@ header {
   padding: 15px 40px;
   text-decoration: none;
   color: white;
-  font-family: "montsrrat", sans-serif;
+  font-family: "Montserrat", sans-serif;
   border-radius: 6px;
   font-size: medium;
   background-size: 200%;
