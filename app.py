@@ -7,7 +7,6 @@ import random
 from collections import Counter
 from dotenv import load_dotenv
 import os
-import re
 import requests
 from functools import wraps
 
@@ -34,7 +33,6 @@ if not (CLIENT_ID and CLIENT_SECRET and SECRET_KEY):
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie'
-# Secure cookie and URL scheme settings (effective in production/HTTPS)
 app.config.update({
     'SESSION_COOKIE_SECURE': True,
     'SESSION_COOKIE_HTTPONLY': True,
@@ -44,11 +42,8 @@ app.config.update({
 
 @app.after_request
 def after_request(response):
-    # Allow external images for flag counter
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    
-    # Basic CSP that allows Google Fonts and flag counter
     response.headers['Content-Security-Policy'] = (
         "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
@@ -58,20 +53,14 @@ def after_request(response):
         "font-src 'self' cdnjs.cloudflare.com fonts.gstatic.com data:; "
         "frame-src 'self'"
     )
-    
     return response
 
 TOKEN_INFO = 'token_info'
-
-# Spotify Authentication Scopes
 SCOPE = 'user-top-read'
-
-# Redirect URI from environment with local fallback
 REDIRECT_URI = os.getenv('REDIRECT_URI', 'https://billify-r0yy.onrender.com/redirectPage')
 
 
 def retry_on_failure(max_retries=3, delay=1):
-    """Decorator to retry API calls with exponential backoff"""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -92,27 +81,17 @@ def retry_on_failure(max_retries=3, delay=1):
 
 
 def create_spotify_client(token):
-    """Create Spotify client with increased timeout"""
     return spotipy.Spotify(
         auth=token,
-        requests_timeout=10,  # 10 second timeout
+        requests_timeout=10,
         retries=3,
         status_retries=3
     )
 
 
-def clear_cache():
-    try:
-        os.remove(".cache")
-    except OSError as e:
-        print(f"Error deleting .cache file: {e}")
-
-
 def format_duration(duration_ms):
     minutes, seconds = divmod(duration_ms // 1000, 60)
     return f"{minutes}:{seconds:02d}"
-
-# Register mmss filter with Jinja2 environment
 
 
 @app.template_filter('mmss')
@@ -121,20 +100,13 @@ def _jinja2_filter_mmss(duration_ms):
 
 
 def generate_random_card_number():
-    # Generate the first 12 digits as asterisks
     first_part = '**** **** *** '
-
-    # Generate the last 4 digits randomly
     last_part = ''.join(str(random.randint(0, 9)) for _ in range(4))
-
-    # Concatenate and return the full card number
     return f"{first_part}{last_part}"
 
 
 def generate_random_auth_code():
     return f"{random.randint(100000, 999999)}"
-
-# Custom filter function to format dates
 
 
 @app.template_filter('strftime')
@@ -143,7 +115,7 @@ def _jinja2_filter_datetime(date, fmt=None):
         try:
             date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%fZ')
         except ValueError:
-            return date  # Return original date if parsing fails
+            return date
     if isinstance(date, datetime):
         return date.strftime(fmt) if fmt else date
     return ''
@@ -159,25 +131,24 @@ def get_token():
 
     if is_expired:
         sp_oauth = SpotifyOAuth(
-            client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
-        token_info = sp_oauth.get_cached_token()
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET,
+            redirect_uri=REDIRECT_URI,
+            scope=SCOPE,
+            cache_handler=spotipy.cache_handler.MemoryCacheHandler()
+        )
+        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
         if not token_info:
-            return None  # Token could not be refreshed
+            return None
         session[TOKEN_INFO] = token_info
 
     return token_info
 
 
 def get_spotify_track_link(track_name, artist_name, track_object=None):
-    """
-    Get Spotify track link. If track_object is provided (from top tracks API),
-    use the direct link. Otherwise, search for it.
-    """
-    # If we have the track object from the API, use the direct link
     if track_object and 'external_urls' in track_object and 'spotify' in track_object['external_urls']:
         return track_object['external_urls']['spotify']
-    
-    # Fallback to search (for cases where you don't have the track object)
+
     token_info = get_token()
     if not token_info:
         return None
@@ -185,17 +156,17 @@ def get_spotify_track_link(track_name, artist_name, track_object=None):
     try:
         sp = create_spotify_client(token_info['access_token'])
         query = f'track:"{track_name}" artist:"{artist_name}"'
-        
+
         @retry_on_failure(max_retries=3, delay=1)
         def search_track():
             return sp.search(q=query, type='track', limit=1)
-        
+
         results = search_track()
         if results and results['tracks']['items']:
             return results['tracks']['items'][0]['external_urls']['spotify']
     except Exception as e:
         print(f"Error searching for track {track_name} by {artist_name}: {e}")
-    
+
     return None
 
 
@@ -204,19 +175,16 @@ def get_spotify_artist_link(artist_id):
 
 
 def get_duration_from_button():
-    duration = request.form.get('duration', 'medium_term')
-    return duration
+    return request.form.get('duration', 'medium_term')
 
 
 def get_limit_from_button():
-    limit = request.form.get('limit', 10)
-    return int(limit)
+    return int(request.form.get('limit', 10))
 
 
 @retry_on_failure(max_retries=3, delay=1)
 def get_audio_features(sp, track_ids):
-    features = sp.audio_features(tracks=track_ids)
-    return features
+    return sp.audio_features(tracks=track_ids)
 
 
 def calculate_insights(sp, top_tracks):
@@ -250,8 +218,8 @@ def calculate_insights(sp, top_tracks):
         insights['energy'] += features['energy'] * 100
         insights['acousticness'] += features['acousticness'] * 100
         insights['instrumentalness'] += features['instrumentalness'] * 100
-    num_tracks = len(top_tracks)
 
+    num_tracks = len(top_tracks)
     if num_tracks > 0:
         insights['popularity_score'] = total_popularity / num_tracks
         insights['average_track_age'] = total_years / num_tracks
@@ -285,7 +253,6 @@ def contact():
     return render_template('contact.html')
 
 
-# SEO Enhancement: Add robots.txt
 @app.route('/robots.txt')
 def robots_txt():
     response = app.response_class(
@@ -297,8 +264,6 @@ Allow: /contact
 Disallow: /billify
 Disallow: /login
 Disallow: /redirectPage
-Disallow: /debug-flag-counter
-Disallow: /test-flag-counter
 
 Sitemap: {}/sitemap.xml""".format(request.url_root.rstrip('/')),
         status=200,
@@ -306,12 +271,11 @@ Sitemap: {}/sitemap.xml""".format(request.url_root.rstrip('/')),
     )
     return response
 
-# SEO Enhancement: Add sitemap.xml
+
 @app.route('/sitemap.xml')
 def sitemap_xml():
     base_url = request.url_root.rstrip('/')
-    
-    sitemap_xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>{base_url}/</loc>
@@ -338,23 +302,14 @@ def sitemap_xml():
         <priority>0.7</priority>
     </url>
 </urlset>"""
-    
-    response = app.response_class(
-        response=sitemap_xml,
-        status=200,
-        mimetype='application/xml'
-    )
-    return response
+    return app.response_class(response=sitemap, status=200, mimetype='application/xml')
 
 
 @app.route('/debug-flag-counter')
 def debug_flag_counter():
-    """Debug endpoint to test flag counter visibility"""
     try:
-        # Test if flag counter URL is accessible
         flag_url = "https://s01.flagcounter.com/count2/HTLF/bg_FFFFFF/txt_000000/border_CCCCCC/columns_2/maxflags_10/viewers_0/labels_1/pageviews_0/flags_0/percent_0/"
         response = requests.get(flag_url, timeout=10)
-        
         return jsonify({
             'status': 'success',
             'flag_counter_accessible': response.status_code == 200,
@@ -376,39 +331,46 @@ def debug_flag_counter():
 
 @app.route('/test-flag-counter')
 def test_flag_counter():
-    """Test page for flag counter visibility"""
     return render_template('test-flag-counter.html')
 
 
 @app.route('/login')
 def login():
-    clear_cache()
     sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URI,
+        scope=SCOPE,
+        cache_handler=spotipy.cache_handler.MemoryCacheHandler()
+    )
     auth_url = sp_oauth.get_authorize_url()
-    print(f"Auth URL: {auth_url}")  # Debug print
+    print(f"Auth URL: {auth_url}")
     return redirect(auth_url)
 
 
 @app.route('/redirectPage')
 def redirectPage():
-    print("Reached /redirectPage endpoint")  # Debug print
-    print(request.args)  # Print incoming request arguments
+    print("Reached /redirectPage endpoint")
+    print(request.args)
     sp_oauth = SpotifyOAuth(
-        client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI, scope=SCOPE)
-    # Clear session and cache
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URI,
+        scope=SCOPE,
+        cache_handler=spotipy.cache_handler.MemoryCacheHandler()
+    )
     session.clear()
     code = request.args.get('code')
-    print(f"Redirected to /redirectPage with code: {code}")  # Debug print
-    print(f"Full request URL: {request.url}")  # Debug print
+    print(f"Redirected to /redirectPage with code: {code}")
+    print(f"Full request URL: {request.url}")
     if code is None:
         return "Error: Missing code parameter"
     try:
         token_info = sp_oauth.get_access_token(code)
-        print(f"Token info: {token_info}")  # Debug print
+        print(f"Token info: {token_info}")
         session[TOKEN_INFO] = token_info
     except Exception as e:
-        print(f"Error obtaining token: {e}")  # Debug print
+        print(f"Error obtaining token: {e}")
         return f"Error obtaining token: {e}"
     return redirect(url_for('billify'))
 
@@ -421,11 +383,11 @@ def billify():
 
     try:
         sp = create_spotify_client(token_info['access_token'])
-        
+
         @retry_on_failure(max_retries=3, delay=1)
         def get_user_info():
             return sp.current_user()
-        
+
         user_info = get_user_info()
         user_name = user_info['display_name']
 
@@ -440,26 +402,26 @@ def billify():
         }
 
         duration_text = duration_text_map.get(duration, 'Last Month')
-        get_spotify_link = None  # Initialize the variable
+        get_spotify_link = None
 
         if metric == 'tracks':
             id = "top_tracks"
-            
+
             @retry_on_failure(max_retries=3, delay=1)
             def get_top_tracks():
                 return sp.current_user_top_tracks(limit=limit, time_range=duration)
-            
+
             top_data = get_top_tracks()
             top_items = top_data['items']
             get_spotify_link = get_spotify_track_link
-            
+
         elif metric == 'genres':
             id = "top_genres"
-            
+
             @retry_on_failure(max_retries=3, delay=1)
             def get_top_artists_for_genres():
                 return sp.current_user_top_artists(limit=50, time_range=duration)
-            
+
             top_artists_data = get_top_artists_for_genres()
             top_artists = top_artists_data['items']
 
@@ -478,29 +440,24 @@ def billify():
 
         elif metric == 'stats':
             id = "top_stats"
-            
+
             @retry_on_failure(max_retries=3, delay=1)
             def get_top_tracks_for_stats():
                 return sp.current_user_top_tracks(limit=limit, time_range=duration)
-            
+
             top_data = get_top_tracks_for_stats()
             top = top_data['items']
             insights = calculate_insights(sp, top)
 
             top_items = [
-                {'name': 'Popularity Score',
-                    'value': f"{insights['popularity_score']:.2f}/100"},
-                {'name': 'Average Track Age',
-                    'value': f"{insights['average_track_age']:.1f} YRS"},
+                {'name': 'Popularity Score', 'value': f"{insights['popularity_score']:.2f}/100"},
+                {'name': 'Average Track Age', 'value': f"{insights['average_track_age']:.1f} YRS"},
                 {'name': 'Tempo', 'value': f"{insights['tempo']:.1f} BPM"},
                 {'name': 'Happiness', 'value': f"{insights['happiness']:.2f}"},
-                {'name': 'Danceability',
-                    'value': f"{insights['danceability']:.2f}"},
+                {'name': 'Danceability', 'value': f"{insights['danceability']:.2f}"},
                 {'name': 'Energy', 'value': f"{insights['energy']:.2f}"},
-                {'name': 'Acousticness',
-                    'value': f"{insights['acousticness']:.2f}"},
-                {'name': 'Instrumentalness',
-                    'value': f"{insights['instrumentalness']:.2f}"}
+                {'name': 'Acousticness', 'value': f"{insights['acousticness']:.2f}"},
+                {'name': 'Instrumentalness', 'value': f"{insights['instrumentalness']:.2f}"}
             ]
 
             def get_spotify_link_for_stats(name, _):
@@ -509,27 +466,27 @@ def billify():
 
         else:
             id = "top_artists"
-            
+
             @retry_on_failure(max_retries=3, delay=1)
             def get_top_artists():
                 return sp.current_user_top_artists(limit=limit, time_range=duration)
-            
+
             top_data = get_top_artists()
             top_items = top_data['items']
             get_spotify_link = get_spotify_artist_link
 
         current_time = datetime.now().strftime('%A, %B %d, %Y')
-
         random_card_number = generate_random_card_number()
         random_auth_code = generate_random_auth_code()
 
         return render_template('billify.html', user_name=user_name, top_items=top_items, id=id, duration=duration,
                                duration_text=duration_text, currentTime=current_time, card_number=random_card_number,
                                auth_code=random_auth_code, metric=metric, limit=limit, get_spotify_link=get_spotify_link)
-    
+
     except Exception as e:
         print(f"Error in billify route: {e}")
-        return redirect(url_for('login'))  # Redirect to login if there's a major error
+        return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
