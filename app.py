@@ -57,7 +57,7 @@ def after_request(response):
 
 TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
-REDIRECT_URI = os.getenv('REDIRECT_URI', 'https://billify-r0yy.onrender.com/redirectPage')
+REDIRECT_URI = os.getenv('REDIRECT_URI', 'https://zaxnite-billify.vercel.app/redirectPage')
 
 
 def retry_on_failure(max_retries=3, delay=1):
