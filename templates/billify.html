@@ -332,33 +332,39 @@
             });
             
             function downloadCanvas(canvas) {
-                try {
-                    // Check if canvas has content
-                    if (canvas.width === 0 || canvas.height === 0) {
-                        throw new Error('Canvas is empty');
-                    }
-                    
-                    // Create download link
+            try {
+                if (canvas.width === 0 || canvas.height === 0) {
+                    throw new Error('Canvas is empty');
+                }
+
+                const dataUrl = canvas.toDataURL('image/png', 1.0);
+
+                // Detect iOS
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+                if (isIOS) {
+                    // iOS doesn't support <a download>, open in new tab instead
+                    const newTab = window.open();
+                    newTab.document.write('<img src="' + dataUrl + '" style="max-width:100%"><br><p style="font-family:sans-serif;text-align:center">Long press the image and tap <b>Save to Photos</b></p>');
+                    newTab.document.close();
+                } else {
                     const link = document.createElement('a');
                     link.download = '{{ user_name }}_receipt.png';
-                    link.href = canvas.toDataURL('image/png', 1.0);
-                    
-                    // Append to body, click, and remove
+                    link.href = dataUrl;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    
-                    // Reset button
-                    button.textContent = originalText;
-                    button.disabled = false;
-                } catch (error) {
-                    console.error('Error creating download:', error);
-                    alert('Failed to save image: ' + error.message);
-                    button.textContent = originalText;
-                    button.disabled = false;
                 }
+
+                button.textContent = originalText;
+                button.disabled = false;
+            } catch (error) {
+                console.error('Error creating download:', error);
+                alert('Failed to save image: ' + error.message);
+                button.textContent = originalText;
+                button.disabled = false;
             }
-        });
+        }});
 
   </script>
   <script src="{{ url_for('static', filename='shared.js') }}"></script>

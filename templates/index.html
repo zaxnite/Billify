@@ -5,37 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     
     <!-- SEO Meta Tags -->
-    <title>Billify - Your Spotify Music Statistics & Analytics</title>
-    <meta name="description" content="Discover your Spotify music taste with Billify! Get detailed analytics of your top tracks, artists, genres, and listening habits. Create beautiful music reports and share your musical journey." />
-    <meta name="keywords" content="spotify analytics, music statistics, top tracks, top artists, spotify wrapped, music analysis, listening habits, spotify data, music insights" />
+    <title>Billify - Spotify Music Statistics, Top Tracks & Listening Analytics</title>
+    <meta name="description" content="Billify turns your Spotify listening history into a beautiful receipt. Discover your top tracks, top artists, top genres, danceability, energy, tempo and more. Free Spotify analytics tool." />
+    <meta name="keywords" content="spotify analytics, spotify statistics, top tracks, top artists, spotify wrapped alternative, music analysis, listening habits, spotify data, music insights, spotify receipt, genre statistics, spotify top songs, music taste, audio features, danceability, energy score" />
     <meta name="author" content="Aathif Khan" />
     <meta name="robots" content="index, follow" />
     
-    <!-- Open Graph Meta Tags (Facebook, LinkedIn) -->
+    <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Billify - Your Spotify Music Statistics & Analytics" />
-    <meta property="og:description" content="Discover your Spotify music taste with detailed analytics of your top tracks, artists, and genres." />
+    <meta property="og:title" content="Billify - Spotify Music Statistics & Listening Analytics" />
+    <meta property="og:description" content="Turn your Spotify listening history into a beautiful receipt. See your top tracks, artists, genres and detailed audio stats." />
     <meta property="og:image" content="{{ url_for('static', filename='icon.ico', _external=True) }}" />
     <meta property="og:url" content="{{ request.url }}" />
     <meta property="og:site_name" content="Billify" />
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Billify - Your Spotify Music Statistics & Analytics" />
-    <meta name="twitter:description" content="Discover your Spotify music taste with detailed analytics of your top tracks, artists, and genres." />
+    <meta name="twitter:title" content="Billify - Spotify Music Statistics & Listening Analytics" />
+    <meta name="twitter:description" content="Turn your Spotify listening history into a beautiful receipt. See your top tracks, artists, genres and detailed audio stats." />
     <meta name="twitter:image" content="{{ url_for('static', filename='icon.ico', _external=True) }}" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url_for('home', _external=True) }}" />
+    <meta name="google-site-verification" content="RURhaZBGi0ACj95R9nwntwQVLkJIlmo73ZP-Xam2Y8I" />
     
     <!-- Additional SEO -->
     <meta name="theme-color" content="#1DB954" />
     <meta name="application-name" content="Billify" />
     
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
     <link rel="icon" href="{{ url_for('static', filename='icon.ico') }}" />
     <link
       rel="stylesheet"
@@ -51,13 +49,14 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "Billify",
-      "description": "Spotify music analytics and statistics application that helps users discover their music taste",
+      "description": "Billify is a free Spotify analytics tool that turns your listening history into a receipt-style report. View your top tracks, artists, genres, and detailed audio feature statistics.",
       "url": "{{ url_for('home', _external=True) }}",
       "applicationCategory": "MusicApplication",
       "operatingSystem": "Web Browser",
       "author": {
         "@type": "Person",
-        "name": "Aathif Khan"
+        "name": "Aathif Khan",
+        "url": "https://github.com/zaxnite"
       },
       "offers": {
         "@type": "Offer",
@@ -67,10 +66,15 @@
       },
       "featureList": [
         "Top Tracks Analysis",
-        "Top Artists Statistics", 
+        "Top Artists Statistics",
         "Genre Distribution",
-        "Music Listening Insights",
-        "Audio Feature Analysis"
+        "Danceability Score",
+        "Energy Level Analysis",
+        "Tempo and BPM Statistics",
+        "Acousticness and Instrumentalness",
+        "Spotify Wrapped Alternative",
+        "Receipt Style Music Report",
+        "Short Term and Long Term Listening History"
       ]
     }
     </script>
@@ -103,9 +107,10 @@
           </div>
         </div>
       </header>
+
       <div class="center">
-        <h1>Welcome</h1>
-        <h2 class="index">Your Spotify Bills</h2>
+        <h1>Welcome to Billify</h1>
+        <h2 class="index">Your Spotify Listening History, Served as a Receipt</h2>
         <div class="container">
           <a href="{{ url_for('login') }}" class="spotifyButton">
             Log in with Spotify
@@ -113,7 +118,60 @@
         </div>
       </div>
 
-  <footer>
+      <!-- SEO Content Section -->
+      <div class="seo-content">
+        <p class="seo-intro">
+          Billify is a free Spotify analytics tool that connects to your Spotify account and displays your listening history as a stylized receipt.
+          Unlike Spotify Wrapped, which only shows your year-end stats, Billify lets you explore your top tracks, artists, and genres across three time periods any time of the year.
+        </p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <h3>Top Tracks</h3>
+            <p>See exactly which songs you have been listening to the most over the last month, last 6 months, or last year. Ranked by play frequency using Spotify's own listening data.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Top Artists</h3>
+            <p>Find out which artists dominate your listening habits. See their popularity score and how they rank in your personal music taste across different time windows.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Top Genres</h3>
+            <p>Discover the genres that define your music taste. See what percentage of your top artists fall into each genre category, from pop and hip-hop to indie and classical.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Listening Stats</h3>
+            <p>Go deeper with audio feature analysis. Billify uses Spotify's audio analysis API to calculate your average danceability, energy, tempo, happiness, acousticness, and instrumentalness scores.</p>
+          </div>
+        </div>
+
+        <div class="seo-about">
+          <h2>What is Billify?</h2>
+          <p>
+            Billify is a Spotify analytics web app built with Python and Flask, using the Spotify Web API to pull your personal listening data.
+            It formats your music stats in a unique receipt-style layout, making it easy to read and share.
+            You can view your top 10, 20, or 30 items and switch between short term (last month), medium term (last 6 months), and long term (last year) data.
+          </p>
+          <p>
+            Spotify's audio features API provides detailed metrics for every track, including danceability (how suitable a track is for dancing), valence (musical happiness), energy (intensity and activity), acousticness, instrumentalness, and tempo in BPM.
+            Billify aggregates these across your top tracks to give you a unique fingerprint of your music taste.
+          </p>
+
+          <h2>How is Billify Different from Spotify Wrapped?</h2>
+          <p>
+            Spotify Wrapped is only available once a year, at the end of December. Billify gives you the same kind of insight any time you want it.
+            You can check your stats in January, mid-year, or whenever you are curious about how your music taste has shifted.
+            Billify also goes deeper than Wrapped with audio feature analysis that Spotify does not surface in its own app.
+          </p>
+
+          <h2>Is Billify Free?</h2>
+          <p>
+            Yes. Billify is completely free to use. It uses Spotify's official Web API and only requests read access to your listening history.
+            No data is stored on any server. Your Spotify token is kept only in your browser session and expires after one hour.
+          </p>
+        </div>
+      </div>
+
+      <footer>
         <div class="waves">
           <div class="wave" id="wave1"></div>
           <div class="wave" id="wave2"></div>
@@ -122,24 +180,16 @@
         </div>
         <ul class="social_icon">
           <li>
-            <a href="mailto:ak7221@rit.edu"
-              ><i class="fa-solid fa-envelope"></i
-            ></a>
+            <a href="mailto:ak7221@rit.edu"><i class="fa-solid fa-envelope"></i></a>
           </li>
           <li>
-            <a href="https://www.linkedin.com/in/aathif-khan-042214201/"
-              ><i class="fa-brands fa-linkedin"></i
-            ></a>
+            <a href="https://www.linkedin.com/in/aathif-khan-042214201/"><i class="fa-brands fa-linkedin"></i></a>
           </li>
           <li>
-            <a href="https://github.com/zaxnite"
-              ><i class="fa-brands fa-github"></i
-            ></a>
+            <a href="https://github.com/zaxnite"><i class="fa-brands fa-github"></i></a>
           </li>
           <li>
-            <a href="https://www.instagram.com/aathif.mp3/"
-              ><i class="fa-brands fa-instagram"></i
-            ></a>
+            <a href="https://www.instagram.com/aathif.mp3/"><i class="fa-brands fa-instagram"></i></a>
           </li>
         </ul>
         <ul class="menu">
@@ -149,7 +199,6 @@
           <li><a href="{{ url_for('contact') }}">Contact Me</a></li>
         </ul>
         <p>Made by Aathif Khan</p>
-        <!-- Flag Counter: constant style across themes -->
         <div class="flag-counter-wrapper">
           <a href="https://info.flagcounter.com/HTLF" target="_blank" rel="noopener">
             <img id="flag-counter-img" 
