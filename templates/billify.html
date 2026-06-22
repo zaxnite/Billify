@@ -332,39 +332,62 @@
             });
             
             function downloadCanvas(canvas) {
-            try {
-                if (canvas.width === 0 || canvas.height === 0) {
-                    throw new Error('Canvas is empty');
+                try {
+                    if (canvas.width === 0 || canvas.height === 0) {
+                        throw new Error('Canvas is empty');
+                    }
+
+                    const dataUrl = canvas.toDataURL('image/png', 1.0);
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                    const canShare = navigator.share && navigator.canShare;
+
+                    if (isIOS || canShare) {
+                        // Use native share sheet on mobile
+                        canvas.toBlob(function(blob) {
+                            const file = new File([blob], '{{ user_name }}_receipt.png', { type: 'image/png' });
+                            if (navigator.share && navigator.canShare({ files: [file] })) {
+                                navigator.share({
+                                    title: '{{ user_name }}\'s Spotify Receipt',
+                                    text: 'Check out my Spotify listening stats on Billify!',
+                                    files: [file]
+                                }).then(() => {
+                                    button.textContent = originalText;
+                                    button.disabled = false;
+                                }).catch((err) => {
+                                    // User cancelled or share failed, fallback to new tab
+                                    openInNewTab(dataUrl);
+                                });
+                            } else {
+                                openInNewTab(dataUrl);
+                            }
+                        }, 'image/png');
+                    } else {
+                        // Desktop: regular download
+                        const link = document.createElement('a');
+                        link.download = '{{ user_name }}_receipt.png';
+                        link.href = dataUrl;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error creating download:', error);
+                    alert('Failed to save image: ' + error.message);
+                    button.textContent = originalText;
+                    button.disabled = false;
                 }
+            }
 
-                const dataUrl = canvas.toDataURL('image/png', 1.0);
-
-                // Detect iOS
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-                if (isIOS) {
-                    // iOS doesn't support <a download>, open in new tab instead
-                    const newTab = window.open();
-                    newTab.document.write('<img src="' + dataUrl + '" style="max-width:100%"><br><p style="font-family:sans-serif;text-align:center">Long press the image and tap <b>Save to Photos</b></p>');
-                    newTab.document.close();
-                } else {
-                    const link = document.createElement('a');
-                    link.download = '{{ user_name }}_receipt.png';
-                    link.href = dataUrl;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-
-                button.textContent = originalText;
-                button.disabled = false;
-            } catch (error) {
-                console.error('Error creating download:', error);
-                alert('Failed to save image: ' + error.message);
+            function openInNewTab(dataUrl) {
+                const newTab = window.open();
+                newTab.document.write('<img src="' + dataUrl + '" style="max-width:100%"><br><p style="font-family:sans-serif;text-align:center">Long press the image and tap <b>Save to Photos</b></p>');
+                newTab.document.close();
                 button.textContent = originalText;
                 button.disabled = false;
             }
-        }});
+        });
 
   </script>
   <script src="{{ url_for('static', filename='shared.js') }}"></script>
