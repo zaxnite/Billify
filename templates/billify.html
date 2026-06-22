@@ -59,7 +59,7 @@
                 {% from 'macros.html' import receiptContainer %}
                 {{ receiptContainer(user_name, top_items, id, duration_text, currentTime, card_number, auth_code, get_spotify_link, metric) }}
             </div>
-            <button id="save-image-button">Save Image</button>
+            <button id="save-image-button">Save / Share</button>
         </div>
         <div class="right-box">
             {% if user_name == 'ishi' %}
@@ -185,48 +185,47 @@
             });
         });
 
-        // Function to convert image to base64
-        function imageToBase64(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = this.width;
-                    canvas.height = this.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(this, 0, 0);
-                    resolve(canvas.toDataURL('image/png'));
-                };
-                img.onerror = reject;
-                img.src = url;
-            });
-        }
-
         document.getElementById('save-image-button').addEventListener('click', function() {
             const button = this;
             const originalText = button.textContent;
-            
-            // Show loading state
+
             button.textContent = 'Generating...';
             button.disabled = true;
-            
-            // Get the receipt element
+
+            // Open fallback tab immediately while we still have the user gesture
+            // Safari blocks window.open() inside async callbacks
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isMobile = isIOS || /Android/i.test(navigator.userAgent);
+            let fallbackTab = null;
+            if (isMobile) {
+                fallbackTab = window.open('', '_blank');
+                if (fallbackTab) {
+                    fallbackTab.document.write('<p style="font-family:sans-serif;text-align:center;padding:40px;font-size:16px">Generating your receipt, please wait...</p>');
+                }
+            }
+
             const receiptElement = document.querySelector(".receipt");
-            
-            // Ensure element is visible and has content
+
             if (!receiptElement || receiptElement.offsetHeight === 0) {
                 alert('Receipt not found or not visible');
                 button.textContent = originalText;
                 button.disabled = false;
+                if (fallbackTab) fallbackTab.close();
                 return;
             }
-            
-            // Check if we're in dark mode
+
             const isDarkMode = document.body.classList.contains('dark-mode');
-            
+
+            // Timeout safety net
+            const timeout = setTimeout(() => {
+                button.textContent = originalText;
+                button.disabled = false;
+                if (fallbackTab) fallbackTab.close();
+                alert('Taking too long to generate. Please try again.');
+            }, 15000);
+
             html2canvas(receiptElement, {
-                backgroundColor: null, // transparent so we can draw paper under it
+                backgroundColor: null,
                 scale: 1.5,
                 useCORS: true,
                 allowTaint: true,
@@ -237,7 +236,6 @@
                     return element.classList && element.classList.contains('ignore-capture');
                 },
                 onclone: function(clonedDoc) {
-                    // Apply inline styles to ensure visibility
                     const clonedReceipt = clonedDoc.querySelector('.receipt');
                     if (clonedReceipt) {
                         clonedReceipt.style.display = 'block';
@@ -246,7 +244,7 @@
                         clonedReceipt.style.position = 'relative';
                         clonedReceipt.style.zIndex = '1';
                     }
-                    
+
                     const clonedContainer = clonedDoc.querySelector('.receiptContainer');
                     if (clonedContainer) {
                         clonedContainer.style.display = 'inline-block';
@@ -258,11 +256,9 @@
                         clonedContainer.style.width = '300px';
                         clonedContainer.style.fontWeight = '550';
                         clonedContainer.style.textTransform = 'uppercase';
-                        // Remove background colors/images so transparency works
                         clonedContainer.style.background = 'transparent';
                     }
-                    
-                    // Ensure images are correct for theme
+
                     const spotifyLogo = clonedDoc.querySelector('#spotify-logo');
                     if (spotifyLogo) {
                         spotifyLogo.src = isDarkMode
@@ -273,6 +269,7 @@
                         spotifyLogo.style.width = '60%';
                         spotifyLogo.style.paddingTop = '20px';
                     }
+
                     const barcodeImage = clonedDoc.querySelector('#barcode-image');
                     if (barcodeImage) {
                         barcodeImage.src = isDarkMode
@@ -282,7 +279,7 @@
                         barcodeImage.style.margin = '0 auto';
                         barcodeImage.style.width = '80%';
                     }
-                    // Force text colors for visibility
+
                     clonedDoc.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div').forEach(el => {
                         if (el.textContent && el.textContent.trim() !== '') {
                             el.style.color = isDarkMode ? '#ffffff' : '#000000';
@@ -290,47 +287,53 @@
                     });
                 }
             }).then(canvas => {
-                // Now add background image to the canvas
-                const backgroundImageUrl = isDarkMode ? 
-                    "{{ url_for('static', filename='dark-wrinkled-paper.jpg') }}" : 
+                clearTimeout(timeout);
+
+                const backgroundImageUrl = isDarkMode ?
+                    "{{ url_for('static', filename='dark-wrinkled-paper.jpg') }}" :
                     "{{ url_for('static', filename='wrinkled-paper.jpg') }}";
-                
-                const backgroundImg = new Image();
-                backgroundImg.onload = function() {
-                    // Create a new canvas with background
-                    const newCanvas = document.createElement('canvas');
-                    newCanvas.width = canvas.width;
-                    newCanvas.height = canvas.height;
-                    const ctx = newCanvas.getContext('2d');
-                    
-                    // Fill background color first
-                    ctx.fillStyle = isDarkMode ? '#2a2a2a' : '#f8f8f8';
-                    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
-                    
-                    // Draw background pattern
-                    const pattern = ctx.createPattern(backgroundImg, 'repeat');
-                    ctx.fillStyle = pattern;
-                    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
-                    
-                    // Draw the original canvas on top
-                    ctx.drawImage(canvas, 0, 0);
-                    
-                    // Download the final canvas
-                    downloadCanvas(newCanvas);
-                };
-                backgroundImg.onerror = function() {
-                    // If background image fails, just use the original canvas
-                    downloadCanvas(canvas);
-                };
-                backgroundImg.src = backgroundImageUrl;
-                
+
+                // Fetch background as base64 to avoid CORS/iOS hang
+                fetch(backgroundImageUrl)
+                    .then(res => res.blob())
+                    .then(blob => new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    }))
+                    .then(base64 => {
+                        const backgroundImg = new Image();
+                        backgroundImg.onload = function() {
+                            const newCanvas = document.createElement('canvas');
+                            newCanvas.width = canvas.width;
+                            newCanvas.height = canvas.height;
+                            const ctx = newCanvas.getContext('2d');
+                            ctx.fillStyle = isDarkMode ? '#2a2a2a' : '#f8f8f8';
+                            ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+                            const pattern = ctx.createPattern(backgroundImg, 'repeat');
+                            ctx.fillStyle = pattern;
+                            ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+                            ctx.drawImage(canvas, 0, 0);
+                            downloadCanvas(newCanvas);
+                        };
+                        backgroundImg.onerror = function() {
+                            downloadCanvas(canvas);
+                        };
+                        backgroundImg.src = base64;
+                    })
+                    .catch(() => {
+                        downloadCanvas(canvas);
+                    });
+
             }).catch(error => {
+                clearTimeout(timeout);
                 console.error('Error generating image:', error);
+                if (fallbackTab) fallbackTab.close();
                 alert('Failed to generate image: ' + error.message);
                 button.textContent = originalText;
                 button.disabled = false;
             });
-            
+
             function downloadCanvas(canvas) {
                 try {
                     if (canvas.width === 0 || canvas.height === 0) {
@@ -338,23 +341,21 @@
                     }
 
                     const dataUrl = canvas.toDataURL('image/png', 1.0);
-                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                    const canShare = navigator.share && navigator.canShare;
 
-                    if (isIOS || canShare) {
-                        // Use native share sheet on mobile
+                    if (isMobile) {
                         canvas.toBlob(function(blob) {
                             const file = new File([blob], '{{ user_name }}_receipt.png', { type: 'image/png' });
                             if (navigator.share && navigator.canShare({ files: [file] })) {
+                                // Close fallback tab since we're using share sheet
+                                if (fallbackTab) fallbackTab.close();
                                 navigator.share({
-                                    title: '{{ user_name }}\'s Spotify Receipt',
+                                    title: "{{ user_name }}'s Spotify Receipt",
                                     text: 'Check out my Spotify listening stats on Billify!',
                                     files: [file]
                                 }).then(() => {
                                     button.textContent = originalText;
                                     button.disabled = false;
-                                }).catch((err) => {
-                                    // User cancelled or share failed, fallback to new tab
+                                }).catch(() => {
                                     openInNewTab(dataUrl);
                                 });
                             } else {
@@ -362,7 +363,6 @@
                             }
                         }, 'image/png');
                     } else {
-                        // Desktop: regular download
                         const link = document.createElement('a');
                         link.download = '{{ user_name }}_receipt.png';
                         link.href = dataUrl;
@@ -374,6 +374,7 @@
                     }
                 } catch (error) {
                     console.error('Error creating download:', error);
+                    if (fallbackTab) fallbackTab.close();
                     alert('Failed to save image: ' + error.message);
                     button.textContent = originalText;
                     button.disabled = false;
@@ -381,14 +382,27 @@
             }
 
             function openInNewTab(dataUrl) {
-                const newTab = window.open();
-                newTab.document.write('<img src="' + dataUrl + '" style="max-width:100%"><br><p style="font-family:sans-serif;text-align:center">Long press the image and tap <b>Save to Photos</b></p>');
-                newTab.document.close();
+                if (fallbackTab && !fallbackTab.closed) {
+                    fallbackTab.document.body.innerHTML = '';
+                    fallbackTab.document.write(
+                        '<img src="' + dataUrl + '" style="max-width:100%;display:block;margin:0 auto">' +
+                        '<p style="font-family:sans-serif;text-align:center;padding:16px">Long press the image and tap <b>Save to Photos</b></p>'
+                    );
+                    fallbackTab.document.close();
+                } else {
+                    const newTab = window.open();
+                    if (newTab) {
+                        newTab.document.write(
+                            '<img src="' + dataUrl + '" style="max-width:100%;display:block;margin:0 auto">' +
+                            '<p style="font-family:sans-serif;text-align:center;padding:16px">Long press the image and tap <b>Save to Photos</b></p>'
+                        );
+                        newTab.document.close();
+                    }
+                }
                 button.textContent = originalText;
                 button.disabled = false;
             }
         });
-
   </script>
   <script src="{{ url_for('static', filename='shared.js') }}"></script>
 </body>
