@@ -274,35 +274,7 @@ Sitemap: {}/sitemap.xml""".format(request.url_root.rstrip('/')),
 
 @app.route('/sitemap.xml')
 def sitemap_xml():
-    base_url = request.url_root.rstrip('/')
-    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-        <loc>{base_url}/</loc>
-        <lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>1.0</priority>
-    </url>
-    <url>
-        <loc>{base_url}/about</loc>
-        <lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>{base_url}/privacy</loc>
-        <lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.5</priority>
-    </url>
-    <url>
-        <loc>{base_url}/contact</loc>
-        <lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-</urlset>"""
-    return app.response_class(response=sitemap, status=200, mimetype='application/xml')
+    return app.send_static_file('sitemap.xml')
 
 
 @app.route('/debug-flag-counter')
