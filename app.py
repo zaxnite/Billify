@@ -57,7 +57,7 @@ def after_request(response):
 
 TOKEN_INFO = 'token_info'
 SCOPE = 'user-top-read'
-REDIRECT_URI = os.getenv('REDIRECT_URI', 'https://zaxnite-billify.vercel.app/redirectPage')
+REDIRECT_URI = os.getenv('REDIRECT_URI', 'https://billify-zaxnite.vercel.app/redirectPage')
 
 
 def retry_on_failure(max_retries=3, delay=1):
@@ -181,6 +181,23 @@ def get_duration_from_button():
 def get_limit_from_button():
     return int(request.form.get('limit', 10))
 
+
+@app.after_request
+def after_request(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "img-src 'self' data: blob: *.flagcounter.com; "
+        "connect-src 'self'; "
+        "style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; "
+        "font-src 'self' cdnjs.cloudflare.com fonts.gstatic.com data:; "
+        "frame-src 'self'"
+    )
+    return response
 
 @retry_on_failure(max_retries=3, delay=1)
 def get_audio_features(sp, track_ids):
