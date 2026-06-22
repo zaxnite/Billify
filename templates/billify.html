@@ -185,24 +185,23 @@
             });
         });
 
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isMobile = isIOS || /Android/i.test(navigator.userAgent);
+
         document.getElementById('save-image-button').addEventListener('click', function() {
             const button = this;
             const originalText = button.textContent;
+            const isDarkMode = document.body.classList.contains('dark-mode');
 
+            // On mobile, skip html2canvas entirely and open a print-friendly page
+            if (isMobile) {
+                openMobilePage(isDarkMode);
+                return;
+            }
+
+            // Desktop: use html2canvas as before
             button.textContent = 'Generating...';
             button.disabled = true;
-
-            // Open fallback tab immediately while we still have the user gesture
-            // Safari blocks window.open() inside async callbacks
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isMobile = isIOS || /Android/i.test(navigator.userAgent);
-            let fallbackTab = null;
-            if (isMobile) {
-                fallbackTab = window.open('', '_blank');
-                if (fallbackTab) {
-                    fallbackTab.document.write('<p style="font-family:sans-serif;text-align:center;padding:40px;font-size:16px">Generating your receipt, please wait...</p>');
-                }
-            }
 
             const receiptElement = document.querySelector(".receipt");
 
@@ -210,17 +209,12 @@
                 alert('Receipt not found or not visible');
                 button.textContent = originalText;
                 button.disabled = false;
-                if (fallbackTab) fallbackTab.close();
                 return;
             }
 
-            const isDarkMode = document.body.classList.contains('dark-mode');
-
-            // Timeout safety net
             const timeout = setTimeout(() => {
                 button.textContent = originalText;
                 button.disabled = false;
-                if (fallbackTab) fallbackTab.close();
                 alert('Taking too long to generate. Please try again.');
             }, 15000);
 
@@ -244,7 +238,6 @@
                         clonedReceipt.style.position = 'relative';
                         clonedReceipt.style.zIndex = '1';
                     }
-
                     const clonedContainer = clonedDoc.querySelector('.receiptContainer');
                     if (clonedContainer) {
                         clonedContainer.style.display = 'inline-block';
@@ -258,7 +251,6 @@
                         clonedContainer.style.textTransform = 'uppercase';
                         clonedContainer.style.background = 'transparent';
                     }
-
                     const spotifyLogo = clonedDoc.querySelector('#spotify-logo');
                     if (spotifyLogo) {
                         spotifyLogo.src = isDarkMode
@@ -269,7 +261,6 @@
                         spotifyLogo.style.width = '60%';
                         spotifyLogo.style.paddingTop = '20px';
                     }
-
                     const barcodeImage = clonedDoc.querySelector('#barcode-image');
                     if (barcodeImage) {
                         barcodeImage.src = isDarkMode
@@ -279,7 +270,6 @@
                         barcodeImage.style.margin = '0 auto';
                         barcodeImage.style.width = '80%';
                     }
-
                     clonedDoc.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div').forEach(el => {
                         if (el.textContent && el.textContent.trim() !== '') {
                             el.style.color = isDarkMode ? '#ffffff' : '#000000';
@@ -293,7 +283,6 @@
                     "{{ url_for('static', filename='dark-wrinkled-paper.jpg') }}" :
                     "{{ url_for('static', filename='wrinkled-paper.jpg') }}";
 
-                // Fetch background as base64 to avoid CORS/iOS hang
                 fetch(backgroundImageUrl)
                     .then(res => res.blob())
                     .then(blob => new Promise((resolve) => {
@@ -328,7 +317,6 @@
             }).catch(error => {
                 clearTimeout(timeout);
                 console.error('Error generating image:', error);
-                if (fallbackTab) fallbackTab.close();
                 alert('Failed to generate image: ' + error.message);
                 button.textContent = originalText;
                 button.disabled = false;
@@ -339,70 +327,101 @@
                     if (canvas.width === 0 || canvas.height === 0) {
                         throw new Error('Canvas is empty');
                     }
-
-                    const dataUrl = canvas.toDataURL('image/png', 1.0);
-
-                    if (isMobile) {
-                        canvas.toBlob(function(blob) {
-                            const file = new File([blob], '{{ user_name }}_receipt.png', { type: 'image/png' });
-                            if (navigator.share && navigator.canShare({ files: [file] })) {
-                                // Close fallback tab since we're using share sheet
-                                if (fallbackTab) fallbackTab.close();
-                                navigator.share({
-                                    title: "{{ user_name }}'s Spotify Receipt",
-                                    text: 'Check out my Spotify listening stats on Billify!',
-                                    files: [file]
-                                }).then(() => {
-                                    button.textContent = originalText;
-                                    button.disabled = false;
-                                }).catch(() => {
-                                    openInNewTab(dataUrl);
-                                });
-                            } else {
-                                openInNewTab(dataUrl);
-                            }
-                        }, 'image/png');
-                    } else {
-                        const link = document.createElement('a');
-                        link.download = '{{ user_name }}_receipt.png';
-                        link.href = dataUrl;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        button.textContent = originalText;
-                        button.disabled = false;
-                    }
+                    const link = document.createElement('a');
+                    link.download = '{{ user_name }}_receipt.png';
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    button.textContent = originalText;
+                    button.disabled = false;
                 } catch (error) {
                     console.error('Error creating download:', error);
-                    if (fallbackTab) fallbackTab.close();
                     alert('Failed to save image: ' + error.message);
                     button.textContent = originalText;
                     button.disabled = false;
                 }
             }
-
-            function openInNewTab(dataUrl) {
-                if (fallbackTab && !fallbackTab.closed) {
-                    fallbackTab.document.body.innerHTML = '';
-                    fallbackTab.document.write(
-                        '<img src="' + dataUrl + '" style="max-width:100%;display:block;margin:0 auto">' +
-                        '<p style="font-family:sans-serif;text-align:center;padding:16px">Long press the image and tap <b>Save to Photos</b></p>'
-                    );
-                    fallbackTab.document.close();
-                } else {
-                    const newTab = window.open();
-                    if (newTab) {
-                        newTab.document.write(
-                            '<img src="' + dataUrl + '" style="max-width:100%;display:block;margin:0 auto">' +
-                            '<p style="font-family:sans-serif;text-align:center;padding:16px">Long press the image and tap <b>Save to Photos</b></p>'
-                        );
-                        newTab.document.close();
-                    }
-                }
-                button.textContent = originalText;
-                button.disabled = false;
-            }
         });
+
+        function openMobilePage(isDarkMode) {
+            // Grab the receipt HTML and inline the styles for a standalone page
+            const receiptEl = document.querySelector('.receiptContainer');
+            if (!receiptEl) return;
+
+            const receiptHTML = receiptEl.outerHTML;
+            const bgColor = isDarkMode ? '#1a1a1a' : '#f5f0e8';
+            const textColor = isDarkMode ? '#ffffff' : '#000000';
+            const paperUrl = isDarkMode
+                ? "{{ url_for('static', filename='dark-wrinkled-paper.jpg', _external=True) }}"
+                : "{{ url_for('static', filename='wrinkled-paper.jpg', _external=True) }}";
+            const barcodeUrl = isDarkMode
+                ? "{{ url_for('static', filename='barcode_transparent.png', _external=True) }}"
+                : "{{ url_for('static', filename='barcode.png', _external=True) }}";
+            const spotifyUrl = isDarkMode
+                ? "{{ url_for('static', filename='Spotify_Logo_RGB_White.png', _external=True) }}"
+                : "{{ url_for('static', filename='Spotify_Logo_RGB_Black.png', _external=True) }}";
+
+            const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ user_name }}'s Billify Receipt</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: ${bgColor};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    color: ${textColor};
+  }
+  .hint {
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 8px;
+  }
+  .receiptContainer {
+    background-image: url('${paperUrl}');
+    background-repeat: repeat;
+    background-size: auto;
+    border: 1px solid ${isDarkMode ? '#444' : '#ccc'};
+    padding: 20px;
+    width: 320px;
+    font-weight: 550;
+    text-transform: uppercase;
+    color: ${textColor};
+  }
+  .receiptContainer * { color: ${textColor} !important; }
+  .receiptContainer table { width: 100%; border-collapse: collapse; }
+  .receiptContainer td { padding: 2px 4px; font-size: 12px; }
+  .receiptContainer a { color: ${textColor} !important; text-decoration: none; }
+  #barcode-image { width: 80%; display: block; margin: 0 auto; }
+  #spotify-logo { width: 60%; padding-top: 20px; display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+  <div class="hint">Take a screenshot to save your receipt</div>
+  ${receiptHTML.replace(/src="[^"]*barcode[^"]*"/, 'src="' + barcodeUrl + '"').replace(/src="[^"]*Spotify_Logo[^"]*"/, 'src="' + spotifyUrl + '"')}
+</body>
+</html>`;
+
+            const newTab = window.open('', '_blank');
+            if (newTab) {
+                newTab.document.write(html);
+                newTab.document.close();
+            } else {
+                alert('Please allow popups to use the Save feature on mobile.');
+            }
+        }
   </script>
   <script src="{{ url_for('static', filename='shared.js') }}"></script>
 </body>
